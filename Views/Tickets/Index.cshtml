@@ -1,0 +1,262 @@
+﻿@inject BugTracker.Services.IBTTicketsService _ticketsService
+@inject BugTracker.Services.IBTRolesService _rolesService
+@model IEnumerable<BugTracker.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row pt-5 mb-3 ml-1">
+    <div class="card col-auto" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+        <h3 class="mt-1" style="color:gold;">Active Tickets<a asp-controller="Tickets" asp-action="Create" data-toggle="modal" data-target="#createTicketModal"><i class="icon-plus icons ml-3" style="font-size: 1.2rem"></i></a></h3>
+    </div>
+    <div class="col"></div>
+</div>
+<div class="btn-group col-sm-2 test">
+    <div class="btn btn-secondary">@ViewData["CurrentFilter"]</div>
+    <button class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" style="background-color: #101414; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: .8rem">
+        <form asp-action="Index" method="get">
+            <input class="textButton dropdown-item text-white" type="submit" name="All" value="All Tickets" />
+            <input class="textButton dropdown-item text-white" type="submit" name="AssignedProjectTickets" value="From My Projects" />
+            <input class="textButton dropdown-item text-white" type="submit" name="AssignedTickets" value="Tickets Assigned" />
+            <input class="textButton dropdown-item text-white" type="submit" name="OwnedTickets" value="My Submits" />
+        </form>
+    </div>
+</div>
+<div class="table-responsive">
+    <table id="example" class="table display dataTable table-striped table-bordered table-dark table-hover">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Created)</th>
+                <th>@Html.DisplayNameFor(model => model.TicketPriority)</th>
+                <th>@Html.DisplayNameFor(model => model.TicketStatus)</th>
+                <th>@Html.DisplayNameFor(model => model.TicketType)</th>
+                <th>@Html.DisplayNameFor(model => model.Project)</th>
+                <th>@Html.DisplayNameFor(model => model.Title)</th>
+                <th>@Html.DisplayNameFor(model => model.Description)</th>
+                <th style="width:150px">Submitter</th>
+                <th style="width: 150px">Users On Ticket</th>
+                <th style="width:30px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <form id="delete-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post"></form>
+                    <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.Created)
+                    </td>
+                    @if (item.TicketPriorityId != null)
+                    {
+                        <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                            @item.TicketPriority.Name
+                        </td>
+                    }
+                    else
+                    {
+                        <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                            Pending Assignment...
+                        </td>
+                    }
+                    @if (item.TicketStatusId != null)
+                    {
+                        <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                            @item.TicketStatus.Name
+                        </td>
+                    }
+                    else
+                    {
+                        <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                            Pending Assignment...
+                        </td>
+                    }
+                    <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.TicketType.Name)
+                    </td>
+                    <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
+                    </td>
+                    @if (item.DeveloperUser != null)
+                    {
+                        <td>
+                            <a href='/Users/Profile/@item.DeveloperUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.DeveloperUser.Initials</span></div>@item.DeveloperUser.FullName</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
+                            Pending Assignment...
+                        </td>
+                    }
+                    <td style="position:relative">
+                        @if (await _rolesService.CanInteractTicket(item.Id))
+                        {
+                            <a href="#" data-toggle="modal" data-target="#editModal-@item.Id" style="position:absolute; left:10px;"><i class="icon-pencil icons"></i></a>
+                            <a href="#" id="sweet-@item.Id" style="position:absolute; left:30px"><i class="icon-trash icons"></i></a>
+                        }
+                        else { }
+
+                    </td>
+                </tr>
+
+
+                <div class="modal fade" id="editModal-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content" style="background-color:#1c2020">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Edit Ticket</h5>
+                                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="overflow: scroll;">
+                                <div class="col" style="width:100%">
+                                    <form asp-action="Edit" asp-route-id="@item.Id" method="post" enctype="multipart/form-data">
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                        <input type="hidden" name="ProjectId" value="@item.ProjectId" />
+                                        <input type="hidden" name="OwnerUserId" value="@item.OwnerUserId" />
+                                        <input type="hidden" name="DeveloperUserId" value="@item.DeveloperUserId" />
+                                        <input type="hidden" name="Created" value="@item.Created" />
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.TicketTypeId" class="control-label"></label>
+                                                        <select name="TicketTypeId" class="form-control" asp-items="ViewBag.TicketTypeId"></select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.TicketPriorityId" class="control-label"></label>
+                                                        <select name="TicketPriorityId" class="form-control" asp-items="ViewBag.TicketPriorityId"></select>
+                                                        <span asp-validation-for="@item.TicketPriorityId" class="text-danger"></span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.TicketStatusId" class="control-label"></label>
+                                                        <select name="TicketStatusId" class="form-control" asp-items="ViewBag.TicketStatusId"></select>
+                                                        <span asp-validation-for="@item.TicketStatusId" class="text-danger"></span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.Title" class="control-label"></label>
+                                                        <input name="Title" value="@item.Title" class="form-control" />
+                                                        <span asp-validation-for="@item.Title" class="text-danger"></span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.Description" class="control-label"></label>
+                                                        <input name="Description" value="@item.Description" class="form-control" />
+                                                        <span asp-validation-for="@item.Description" class="text-danger"></span>
+                                                    </div>
+                                                    <div class="custom-file-upload mb-3" style="margin-top: -5px">
+                                                        <label class="control-label text-white">Attachments</label>
+                                                        <input type="file" id="newformfile" name="NewFormFile" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 ml-auto">
+                                                @if ((!User.IsInRole("Demo User")) || (User.IsInRole("Demo User") && await _ticketsService.OwnsTicket(item.Id)))
+                                                {
+                                                    <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-secondary" data-toggle="popover" title="Nice Try!" data-content="You're not a real user yet, so you can't edit content that you didn't create.">Save</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section Scripts{
+    @foreach (var item in Model)
+    {
+        @if ((!User.IsInRole("Demo User")) || (await _ticketsService.OwnsTicket(item.Id)))
+        {
+            <script>
+        $('#sweet-@item.Id').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this ticket.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                        background: '#ffffed',
+                        html: '<p>The ticket was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete-@item.Id\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                        icon: 'success',
+                        iconColor: 'gold',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+            </script>
+        }
+        else
+        {
+            <script>
+        $('#sweet-@item.Id').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this ticket.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                                text: 'Well not really since you are a demo user and a real user created this... but we can pretend it was!',
+                        background: '#ffffed',
+                        icon: 'success',
+                        iconColor: 'gold',
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#1c2020',
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+            </script>
+        }
+    }
+}

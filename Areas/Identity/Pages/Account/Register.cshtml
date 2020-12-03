@@ -1,0 +1,1332 @@
+﻿@page
+@model RegisterModel
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] Register</title>
+    <link rel="shortcut icon" href="~/img/BeeNoWing.ico" />
+
+    @{
+        Layout = null;
+    }
+
+    <link href="~/css/BeeLand.css" rel="stylesheet" />
+
+    <link href="~/css/BeeLogin.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==" crossorigin="anonymous" />
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        a {
+            color: white;
+        }
+
+            a:hover {
+                color: gold;
+                text-decoration: none !important;
+            }
+
+            a:link {
+                text-decoration: none;
+            }
+
+
+            a:visited {
+                text-decoration: none;
+            }
+
+
+            a:active {
+                text-decoration: none;
+            }
+
+        .register-card {
+            position: absolute;
+            bottom: -45vh;
+            width: 100%;
+            height: 80vh;
+            max-height: 700px;
+            border: solid;
+            border-color: gold;
+            background-color: #000;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.8);
+            transition: 0.3s;
+        }
+    </style>
+
+</head>
+<body>
+
+    <section style="overflow:hidden; height:100vh; width:100vw; background-color: #232b2b">
+
+        <div class="loader-bg" id="loader">
+            <div class="loader">
+                <img src="~/img/BeeKeepLogo.svg" id="loaderimg" height="200px" width="200px" />
+            </div>
+        </div>
+
+        <div class="mr-auto sidebar"></div>
+
+        <div class="login">
+            <div class="card register-card offset-2">
+                <img src="~/img/BeeRegisterInvert.svg" class="registerSize" />
+                <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form ml-5" style="margin-top: 100px">
+                        <input asp-for="Input.FirstName" type="text" name="firstname" autocomplete="off" required />
+                        <label asp-for="Input.FirstName" class="label-name"><span class="content-name text-white">First Name:</span></label>
+                        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form ml-5" style="margin-top: 5px">
+                        <input asp-for="Input.LastName" type="text" name="lastname" autocomplete="off" required />
+                        <label asp-for="Input.LastName" class="label-name"><span class="content-name text-white">Last Name:</span></label>
+                        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form ml-5" style="margin-top: 5px">
+                        <input asp-for="Input.Email" type="text" name="email" autocomplete="off" required />
+                        <label asp-for="Input.Email" class="label-name"><span class="content-name text-white">Email:</span></label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form ml-5" style="margin-top: 5px">
+                        <input asp-for="Input.Password" type="password" name="password" autocomplete="off" required />
+                        <label asp-for="Input.Password" class="label-name"><span class="content-name text-white">Password:</span></label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <button class="myButton offset-1 col-4 mt-3" type="submit">Register</button>
+                    </div>
+                </form>
+                <div class="row">
+                    <a class="ml-5 mt-0 col-12" asp-area="Identity" asp-page="/Account/Login">
+                        Already have an Account? Login
+                    </a>
+                    <a class="ml-5 mt-2 col-3" asp-controller="Home" asp-action="Index">
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="ml-auto d-none" id="honeycomb" style=" width:2500px; margin-top: -75px; margin-right: -75px;">
+            <ul class="hex-grid__list" id="hex">
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color1"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color3"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+                <li class="hex-grid__item">
+                    <div class="hex-grid__content color2"></div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <script src="~/js/BeeLogin.js"></script>
+</body>
+</html>

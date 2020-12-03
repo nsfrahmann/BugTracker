@@ -1,0 +1,227 @@
+﻿@inject BugTracker.Services.IBTTicketsService _ticketsService
+@inject BugTracker.Services.IBTProjectsService _projectsService
+@inject BugTracker.Services.IBTRolesService _rolesService
+@model IEnumerable<BugTracker.Models.Project>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="pt-5 mb-3">
+    <div class="card col-2" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+        <h3 class="mt-1" style="color:gold;">Active Projects<a data-toggle="modal" data-target="#createProjectModal" asp-action="Create"><i class="icon-plus icons ml-3" style="font-size: 1.2rem"></i></a></h3>
+
+
+
+    </div>
+</div>
+
+<div class="btn-group col-sm-2 test" style="margin-left: -10px;">
+    <div class="btn btn-secondary">@ViewData["CurrentFilter"]</div>
+    <button class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu">
+        <form asp-action="Index" method="get">
+            <input class="textButton dropdown-item" type="submit" name="All" value="All Tickets" />
+            <input class="textButton dropdown-item" type="submit" name="AssignedProjectTickets" value="From My Projects" />
+            <input class="textButton dropdown-item" type="submit" name="AssignedTickets" value="Tickets Assigned" />
+            <input class="textButton dropdown-item" type="submit" name="OwnedTickets" value="My Submits" />
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table id="example1" class="table display dataTable table-striped table-bordered table-dark table-hover">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Created)</th>
+                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                <th>@Html.DisplayNameFor(model => model.Summary)</th>
+                <th>Project Creator</th>
+                <th>Users On Project</th>
+                <th>Ticket Count</th>
+                <th style="width:30px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+
+                <tr>
+                    <form id="delete-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post"></form>
+                    <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
+                        @item.Created.ToString("MM/dd/yyyy")
+                    </td>
+                    <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
+                        @Html.DisplayFor(modelItem => item.Summary)
+                    </td>
+                    <td>
+                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.OwnerUser.FirstLetter</span><span>@item.OwnerUser.LastLetter</span></div>@item.OwnerUser.FullName</a>
+                    </td>
+                    @if (item.ProjectUsers.Count() > 0)
+                    {
+                        <td>
+                            @foreach (var user in await _projectsService.UsersOnProject(item.Id))
+                            {
+                                <a href='/Users/Profile/@user.Id?click=true&userId=@user.Id' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@user.FirstLetter</span><span>@user.LastLetter</span></div>@user.FullName</a>
+                            }
+                        </td>
+                    }
+                    else
+                    {
+                        <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
+                            Pending Assignment...
+                        </td>
+                    }
+                    <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
+                        @await _ticketsService.GetTicketCount(item.Id) Tickets
+                    </td>
+                    <td style="position:relative">
+                        @if ((await _rolesService.CanInteractProject(item.Id)))
+                        {
+                            <a href="#" data-toggle="modal" data-target="#editModal-@item.Id" style="position:absolute; left:10px;"><i class="icon-pencil icons"></i></a>
+                            <a href="#" id="sweet-@item.Id" style="position:absolute; left:30px"><i class="icon-trash icons"></i></a>
+                        }
+                        else { }
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="editModal-@item.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content" style="background-color:#1c2020">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Edit Project</h5>
+                                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="overflow: scroll;">
+                                <div class="col" style="width:100%">
+                                    <form asp-action="Edit" asp-route-id="@item.Id">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="card-body">
+                                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                    <input type="hidden" name="Id" value="@item.Id" />
+                                                    <input type="hidden" name="OwnerUserId" value="@item.OwnerUserId" />
+                                                    <input type="hidden" name="Created" value="@item.Created" />
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.Name" class="control-label"></label>
+                                                        <input name="Name" value="@item.Name" class="form-control" />
+                                                        <span asp-validation-for="@item.Name" class="text-danger"></span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label asp-for="@item.Summary" class="control-label"></label>
+                                                        <input name="Summary" value="@item.Summary" class="form-control" />
+                                                        <span asp-validation-for="@item.Summary" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 ml-auto">
+                                                @if ((!User.IsInRole("Demo User")) || (User.IsInRole("Demo User") && await _projectsService.OwnsProject(item.Id)))
+                                                {
+                                                    <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-secondary" data-toggle="popover" title="Nice Try!" data-content="You're not a real user yet, so you can't edit content that you didn't create.">Save</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.test').addClass('d-none')
+        })
+
+    </script>
+
+    @foreach (var item in Model)
+    {
+        @if ((!User.IsInRole("Demo User")) || (await _projectsService.OwnsProject(item.Id)))
+        {
+            <script>
+        $('#sweet-@item.Id').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this project.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                        background: '#ffffed',
+                        html: '<p>The project was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete-@item.Id\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                        icon: 'success',
+                        iconColor: 'gold',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+            </script>
+        }
+        else
+        {
+            <script>
+        $('#sweet-@item.Id').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this project.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                                text: 'Well not really since you are a demo user and a real user created this... but we can pretend it was!',
+                        background: '#ffffed',
+                        icon: 'success',
+                        iconColor: 'gold',
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#1c2020',
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+            </script>
+        }
+    }
+}
+

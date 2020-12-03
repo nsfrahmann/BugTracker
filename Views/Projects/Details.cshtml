@@ -1,0 +1,391 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject BugTracker.Services.IBTTicketsService _ticketsService
+@inject BugTracker.Services.IBTProjectsService _projectsService
+@inject BugTracker.Services.IBTRolesService _rolesService
+@inject UserManager<BTUser> UserManager
+@model BugTracker.Models.Project
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+
+<div class="row">
+    <div class="col-6 mt-5">
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+            <h3 class="mt-2" style="color:gold">Project Details</h3>
+            <div class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2)">
+                <dl class="col-12">
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Summary)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.Summary)
+                    </dd>
+                    <dt class="col-sm-12">
+                        Team Members
+                    </dt>
+                    @if (Model.ProjectUsers != null)
+                    {
+                        <dd class="col-sm-12">
+                            @foreach (var user in Model.ProjectUsers)
+                            {
+                                <p>@user.User.FullName</p>
+                            }
+                        </dd>
+                    }
+                    else
+                    {
+                        <dd class="col-sm-12">
+                            Pending Team Assignments...
+                        </dd>
+                    }
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Created)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Model.Created.ToString("MM/dd/yyyy")
+                    </dd>
+                    @if (Model.Updated != null)
+                    {
+                        <dt class="col-sm-12">
+                            @Html.DisplayNameFor(model => model.Updated)
+                        </dt>
+                        <dd class="col-sm-12">
+                            @Model.Updated.Value.ToString("MM/dd/yyyy")
+                        </dd>
+                    }
+
+                </dl>
+                @if ((await _rolesService.CanInteractProject(Model.Id)))
+                {
+                    <button data-toggle="modal" data-target="#exampleModal1" class="btn btn-secondary mb-2 ml-2">Edit</button>
+                    <button id="sweet" class="btn btn-secondary mb-2 ml-2">Delete</button>
+                }
+                else { }
+            </div>
+        </div>
+
+        <form id="delete" asp-action="Delete" asp-route-id="@Model.Id" method="post"></form>
+
+        <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content" style="background-color:#1c2020">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Edit Project</h5>
+                        <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="overflow: scroll;">
+                        <div class="col" style="width:100%">
+                            <form asp-action="Edit" asp-route-id="@Model.Id">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card-body">
+                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                            <input type="hidden" asp-for="Id" />
+                                            <input type="hidden" asp-for="OwnerUserId" />
+                                            <input type="hidden" asp-for="Created" />
+                                            <div class="form-group">
+                                                <label asp-for="Name" class="control-label"></label>
+                                                <input asp-for="Name" class="form-control" />
+                                                <span asp-validation-for="Name" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Summary" class="control-label"></label>
+                                                <input asp-for="Summary" class="form-control" />
+                                                <span asp-validation-for="Summary" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 ml-auto">
+                                        @if ((!User.IsInRole("Demo User")) || (User.IsInRole("Demo User") && await _projectsService.OwnsProject(Model.Id)))
+                                        {
+                                            <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-secondary" data-toggle="popover" title="Nice Try!" data-content="You're not a real user yet, so you can't edit content that you didn't create.">Save</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        }
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-4 mt-5">
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+            <h3 class="mt-2" style="color:gold;">Project User Information</h3>
+            <div class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2)">
+                <dl class="col-12">
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.OwnerUser)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.OwnerUser.FullName)
+                    </dd>
+                    <dt class="col-sm-12">
+                        Users on Project
+                    </dt>
+                    @if (await _projectsService.UsersOnProject(Model.Id) != null)
+                    {
+                        <dd class="col-sm-12">
+                            @foreach (var user in await _projectsService.UsersOnProject(Model.Id))
+                            {
+                                <p>@user.FullName</p>
+                            }
+                        </dd>
+                    }
+                    else
+                    {
+                        <dd class="col-sm-12">
+                            Pending Assignment...
+                        </dd>
+                    }
+                </dl>
+                <button data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary mb-2 ml-2">Assign to Project</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="background-color:#1c2020">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Assign A Developer</h5>
+                    <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="overflow: scroll;">
+                    <div class="col" style="width:100%">
+                        <form asp-action="Edit" asp-route-id="@Model.Id">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="@Model.Name" />
+                            <input type="hidden" asp-for="@Model.Summary" />
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="OwnerUserId" />
+                            <input type="hidden" asp-for="Created" />
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-body form-group">
+                                        <select asp-for="@Model.ProjectUserIds" asp-items="@ViewBag.projectUsers" name="selectedUsers" class="select2 col-12" multiple data-allow-clear="1">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-2 ml-auto">
+                                    <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<hr style="background-color:gold" />
+<div class="row pt-5 mb-3 ml-1">
+    <div class="card col-auto" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+        <h3 class="mt-1" style="color:gold;">Active Tickets<a asp-controller="Tickets" asp-action="Create" data-toggle="modal" data-target="#createTicketModal"><i class="icon-plus icons ml-3" style="font-size: 1.2rem"></i></a></h3>
+    </div>
+    <div class="col"></div>
+</div>
+<div class="table-responsive">
+    <table id="example" class="table display dataTable table-striped table-bordered table-dark">
+        <thead>
+            <tr>
+                <th>
+                    Priority
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Submitter
+                </th>
+                <th>
+                    Assigned
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Tickets)
+            {
+                <tr>
+                    @if (item.TicketPriorityId != null)
+                    {
+                        <td>
+                            @item.TicketPriority.Name
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Pending Assignment...
+                        </td>
+                    }
+                    @if (item.TicketStatusId != null)
+                    {
+                        <td>
+                            @item.TicketStatus.Name
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Pending Assignment...
+                        </td>
+                    }
+                    <td>
+                        @item.TicketType.Name
+                    </td>
+                    <td>
+                        @item.Title
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.OwnerUser.FirstLetter</span><span>@item.OwnerUser.LastLetter</span></div>@item.OwnerUser.FullName</a>
+                    </td>
+                    @if (item.DeveloperUser != null)
+                    {
+                        <td>
+                            <a href='/Users/Profile/@item.DeveloperUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.DeveloperUser.FirstLetter</span><span>@item.DeveloperUser.LastLetter</span></div>@item.DeveloperUser.FullName</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Pending Assignment...
+                        </td>
+                    }
+                    <td>
+                        <a asp-controller="Tickets" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-controller="Tickets" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-controller="Tickets" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script src="https://cdn.tiny.cloud/1/ll8zhakbba1xr0km3e379sdk1lgtrjbl3cltdf4o4gen6z6n/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: '.tiny',
+            min_height: 200,
+            skin: "snow",
+            content_style: "body { color: white; border-top: 1px solid #57606f; border-bottom: 1px solid #57606f; }",
+            icons: "thin",
+            plugins: 'lists codesample autoresize link',
+            menubar: false,
+            toolbar: [
+                'undo redo | styleselect fontsizeselect | bold italic underline strikethrough numlist bullist | link codesample | alignleft aligncenter alignright alignjustify | outdent indent'
+            ],
+            default_link_target: '_blank',
+            codesample_global_prismjs: true,
+            branding: false,
+            elementpath: false
+        });
+    </script>
+
+    @if ((!User.IsInRole("Demo User")) || (await _projectsService.OwnsProject(Model.Id)))
+    {
+        <script>
+        $('#sweet').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this project.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                        background: '#ffffed',
+                        html: '<p>The project was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                        icon: 'success',
+                        iconColor: 'gold',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+        </script>
+    }
+    else
+    {
+        <script>
+        $('#sweet').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this project.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                                text: 'Well not really since you are a demo user and a real user created this... but we can pretend it was!',
+                        background: '#ffffed',
+                        icon: 'success',
+                        iconColor: 'gold',
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#1c2020',
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+        </script>
+    }
+}

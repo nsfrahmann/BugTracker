@@ -1,0 +1,639 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject BugTracker.Services.IBTTicketsService _ticketsService
+@inject BugTracker.Services.IBTHistoriesService _historiesService
+@inject BugTracker.Services.IBTProjectsService _projectsService
+@inject BugTracker.Services.IBTAttachmentsService _attachmentsService
+@inject BugTracker.Services.IBTRolesService _rolesService
+@inject UserManager<BTUser> UserManager
+@model BugTracker.Models.Ticket
+
+@{
+    ViewData["Title"] = "Details";
+}
+@section css{
+    <link href="~/css/select2.min.css" rel="stylesheet" />
+    <link href="~/css/select2-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/downloadbtn.css" rel="stylesheet" />
+
+}
+
+
+<div class="row">
+
+    <div class="col-6 offset-1 mt-5">
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+            <h3 class="mt-2" style="color:gold">Ticket Details</h3>
+            <div class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2)">
+                <dl class="col-12">
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Project)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.Project.Name)
+                    </dd>
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Title)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.Title)
+                    </dd>
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.TicketType)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.TicketType.Name)
+                    </dd>
+                    @if (Model.TicketPriorityId != null)
+                    {
+                        <dt class="col-sm-12">
+                            @Html.DisplayNameFor(model => model.TicketPriority)
+                        </dt>
+                        <dd class="col-sm-12">
+                            @Html.DisplayFor(model => model.TicketPriority.Name)
+                        </dd>
+                    }
+                    else
+                    {
+                        <dt class="col-sm-12">
+                            @Html.DisplayNameFor(model => model.TicketPriority)
+                        </dt>
+                        <dd class="col-sm-12">
+                            Pending Priority Assignment...
+                        </dd>
+                    }
+                    @if (Model.TicketStatusId != null)
+                    {
+                        <dt class="col-sm-12">
+                            @Html.DisplayNameFor(model => model.TicketStatus)
+                        </dt>
+                        <dd class="col-sm-12">
+                            @Html.DisplayFor(model => model.TicketStatus.Name)
+                        </dd>
+                    }
+                    else
+                    {
+                        <dt class="col-sm-12">
+                            @Html.DisplayNameFor(model => model.TicketStatus)
+                        </dt>
+                        <dd class="col-sm-12">
+                            Pending Status Assignment...
+                        </dd>
+                    }
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.Created)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.Created)
+                    </dd>
+                    @if (Model.Updated != null)
+                    {
+                        <dt class="col-sm-12">
+                            @Html.DisplayNameFor(model => model.Updated)
+                        </dt>
+                        <dd class="col-sm-12">
+                            @Model.Updated.Value.ToString("MM/dd/yyyy")
+                        </dd>
+                    }
+                </dl>
+                @if ((Model.Histories.Count > 0) && (await _rolesService.CanInteractTicket(Model.Id)))
+                {
+                    <form asp-action="History" asp-route-id="@Model.Id">
+                        <button type="submit" class="btn btn-secondary mb-2 ml-2">See History</button>
+                    </form>
+                }
+                @if (await _rolesService.CanInteractTicket(Model.Id))
+                {
+                    <button data-toggle="modal" data-target="#exampleModal1" class="btn btn-secondary mb-2 ml-2">Edit</button>
+                    <button id="sweet" class="btn btn-secondary mb-2 ml-2">Delete</button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <form id="delete" asp-action="Delete" asp-route-id="@Model.Id" method="post"></form>
+
+    <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="background-color:#1c2020">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Edit Ticket</h5>
+                    <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="overflow: scroll;">
+                    <div class="col" style="width:100%">
+                        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="ProjectId" />
+                            <input type="hidden" asp-for="OwnerUserId" />
+                            <input type="hidden" asp-for="DeveloperUserId" />
+                            <input type="hidden" asp-for="Created" />
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label asp-for="TicketTypeId" class="control-label"></label>
+                                            <select asp-for="TicketTypeId" class="form-control" asp-items="ViewBag.TicketTypeId"></select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="TicketPriorityId" class="control-label"></label>
+                                            <select asp-for="TicketPriorityId" class="form-control" asp-items="ViewBag.TicketPriorityId"></select>
+                                            <span asp-validation-for="TicketPriorityId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="TicketStatusId" class="control-label"></label>
+                                            <select asp-for="TicketStatusId" class="form-control" asp-items="ViewBag.TicketStatusId"></select>
+                                            <span asp-validation-for="TicketStatusId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="Title" class="control-label"></label>
+                                            <input asp-for="Title" class="form-control" />
+                                            <span asp-validation-for="Title" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="Description" class="control-label"></label>
+                                            <input asp-for="Description" class="form-control" />
+                                            <span asp-validation-for="Description" class="text-danger"></span>
+                                        </div>
+                                        <div class="custom-file-upload mb-3" style="margin-top: -5px">
+                                            <label class="control-label text-white">Attachments</label>
+                                            <input type="file" id="newformfile" name="NewFormFile" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-2 ml-auto">
+                                    @if ((!User.IsInRole("Demo User")) || (User.IsInRole("Demo User") && await _ticketsService.OwnsTicket(Model.Id)))
+                                    {
+                                        <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-secondary" data-toggle="popover" title="Nice Try!" data-content="You're not a real user yet, so you can't edit content that you didn't create.">Save</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4 mt-5">
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+            <h3 class="mt-2" style="color:gold;">Ticket User Information</h3>
+            <div class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2)">
+                <dl class="col-12">
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.OwnerUser)
+                    </dt>
+                    <dd class="col-sm-12">
+                        @Html.DisplayFor(model => model.OwnerUser.FullName)
+                    </dd>
+                    <dt class="col-sm-12">
+                        @Html.DisplayNameFor(model => model.DeveloperUser)
+                    </dt>
+                    @if (Model.DeveloperUser != null)
+                    {
+                        <dd class="col-sm-12">
+                            @Model.DeveloperUser.FullName
+                        </dd>
+                    }
+                    else
+                    {
+                        <dd class="col-sm-12">
+                            Pending Assignment...
+                        </dd>
+                    }
+                </dl>
+
+                @if ((await _projectsService.UsersOnProject(Model.ProjectId) != null))
+                {
+                    <button name="TicketAssign" value="TicketAssign" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary mb-2 ml-2">Assign to Ticket</button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="background-color:#1c2020">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Assign A Developer</h5>
+                    <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="overflow: scroll;">
+                    <div class="col" style="width:100%">
+                        <form asp-action="Edit" asp-route-id="@Model.Id">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="Title" />
+                            <input type="hidden" asp-for="Description" />
+                            <input type="hidden" asp-for="TicketTypeId" />
+                            <input type="hidden" asp-for="TicketStatusId" />
+                            <input type="hidden" asp-for="TicketPriorityId" />
+                            <input type="hidden" asp-for="OwnerUserId" />
+                            <input type="hidden" asp-for="ProjectId" />
+                            <input type="hidden" asp-for="Created" />
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-body form-group">
+                                        <select asp-for="@Model.DeveloperUserId" asp-items="@ViewBag.TicketDevs" name="selectedUsers" class="col-12" data-allow-clear="1">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-2 ml-auto">
+                                    <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="row mt-3">
+    <div class="col-10 offset-1">
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+            <h3 class="mt-2" style="color:gold;">Associated Attachments<button data-toggle="modal" data-target="#addAttachmentModal" class="textButton2"><i class="icon-plus icons ml-3" style="font-size: 1.2rem;"></i></button></h3>
+
+            @if (Model.Attachments.Any())
+            {
+                <dl class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2)">
+                    @foreach (TicketAttachment item in Model.Attachments)
+                    {
+                        <dd class="mt-3 ml-3 mr-4 text-center">
+                            <a asp-action="DownloadFile" asp-route-id="@item.Id" target="_blank">
+                                <img src="@_attachmentsService.GetFileIcon(item.FileName)" style="height:60px;width:60px;" />
+                                <p class="text-muted">@System.IO.Path.GetFileNameWithoutExtension(item.FileName)</p>
+                                <div style="margin-top: -17px">
+                                    <small class="text-muted"> @_attachmentsService.FormatFileSize(item.FileData.Length)</small>
+                                </div>
+                                <small class="date text-muted">@item.Created.ToString("MMM dd, yyyy")</small>
+                            </a>
+                            <div class="row">
+                                @*<a class="button dark" style="transform: scale(.7);">
+                                        <ul style="font-size: 1.2rem; color:gold">
+                                            <li style="margin-left: -20px">&#68;ownload</li>
+                                            <li style="margin-left: -20px">&#68;ownloading</li>
+                                            <li style="margin-left: -20px">&#68;ownloaded</li>
+                                        </ul>
+                                        <div style="margin-left: -25px">
+                                            <svg id="svg-@item.Id" viewBox="0 0 24 24"></svg>
+                                        </div>
+                                    </a>*@
+                                <div class="dark justify-content-center ml-3">
+                                    <form asp-action="DownloadFile" asp-route-id="@item.Id">
+                                        <a download="@System.IO.Path.GetFileName(item.FileName)" href="@_attachmentsService.DecodeAttachment(item.FileData, item.FileName)" type="submit" class="mt-2 ml-2 mb-2 mr-2 textButton2"><i class="icon-cloud-download icons"></i></a>
+                                    </form>
+                                </div>
+                                <div class="dark justify-content-center ml-3">
+                                    <form asp-action="AttachmentDelete" asp-route-id="@item.Id" method="post">
+                                        <button type="submit" class="mt-2 mb-2 ml-2 textButton2"><i class="icon-trash icons"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </dd>
+                    }
+                </dl>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addAttachmentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="background-color:#1c2020">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Add a new Attachment</h5>
+                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow: scroll;">
+                <div class="col" style="width:100%">
+                    <form asp-controller="Tickets" asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="ProjectId" />
+                        <input type="hidden" asp-for="OwnerUserId" />
+                        <input type="hidden" asp-for="DeveloperUserId" />
+                        <input type="hidden" asp-for="Created" />
+                        <input type="hidden" asp-for="Title" />
+                        <input type="hidden" asp-for="Description" />
+                        <input type="hidden" asp-for="TicketTypeId" />
+                        <input type="hidden" asp-for="TicketStatusId" />
+                        <input type="hidden" asp-for="TicketPriorityId" />
+
+                        <div class="custom-file-upload mb-3" style="margin-top: -5px">
+                            <label class="control-label text-white">Attachments</label>
+                            <input type="file" id="newformfile" name="NewFormFile" />
+                        </div>
+                        <div class="mb-2 ml-auto">
+                            <button type="submit" class="btn btn-secondary btn-md mr-2">Add New</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-10 offset-1">
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+            <h3 class="mt-2" style="color:gold;">Create a Comment<button data-toggle="collapse" data-target="#collapseComment" aria-expanded="true" aria-controls="collapseOne" class="textButton2"><i class="icon-plus icons ml-3" style="font-size: 1.2rem;"></i></button></h3>
+            <div id="collapseComment" class="collapse row mb-0 justify-content-center" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2);">
+                <form asp-controller="TicketComments" asp-action="CreateCom" style="width:100%">
+                    @Html.Hidden("TicketId", Model.Id)
+                    @Html.Hidden("AuthorId", UserManager.GetUserId(User))
+                    <div class="col-12 mt-1">
+                        <div class="form-group">
+                            <input name="commentContent" class="tiny form-control" />
+                        </div>
+                    </div>
+                    <div class="col-12 ml-3">
+                        <button type="submit" class="btn btn-secondary btn-md" style=" margin-top: -100px">Submit Comment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@foreach (var comment in Model.TicketComments)
+{
+    <div class="row mt-3">
+        <div class="col-8 offset-1">
+            <div class="card col-12" style="background-color:#1c2020; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+                <div class="card-body pb-0">
+                    <h5 class="header-title mb-0 text-primary">@comment.Author.FullName</h5>
+                </div>
+                <hr />
+                <div class="media d-block d-sm-flex text-left p-4">
+                    <img class="img-fluid d-md-flex mr-sm-4 rounded-circle" src="~Images/author10.jpg" alt="">
+                    <div class="media-body align-self-center position-relative">
+                        <div class="row">
+                            <div class="col-12">
+                                @Html.Raw(comment.Content)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-9">
+                                <div class="float-sm-right float-none h6 mb-0 my-3 my-sm-0">
+                                    <a data-toggle="modal" data-target="#exampleModal-@comment.Id" class="text-primary position-absolute mr-2 my-reply" style="cursor: pointer; bottom: 0; right: 0;"><i class="icofont icofont-bubble-left pr-1"></i> Reply</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="exampleModal-@comment.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content" style="background-color:#1c2020">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">What's the Buzz about?</h5>
+                                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="overflow: scroll;">
+                                <div class="col" style="width:100%">
+                                    <form asp-controller="TicketComments" asp-action="CreateSub" asp-route-foo="@comment.Id">
+                                        @Html.Hidden("TicketId", Model.Id)
+                                        @Html.Hidden("AuthorId", UserManager.GetUserId(User))
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <input name="subcommentContent" class="form-control tiny" />
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 ml-auto">
+                                                <button type="submit" class="btn btn-secondary btn-md mr-2">Submit Reply</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @foreach (var subcomment in comment.TicketSubComments)
+                {
+                    <div class="row mt-3">
+                        <div class="col-1 ml-2"></div>
+                        <div class="card col-11 mr-5" style="box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.8); transition: 0.3s; background-color:#101414; margin-left: -20px;">
+                            <div class="row">
+                                <div class="col-1 mt-1">
+                                    <img src="https://img.icons8.com/fluent/48/000000/reply-arrow.png" style="transform: rotate(180deg); max-width:100%; height: auto;" />
+                                </div>
+                                <div class="col-5">
+                                    <h6 class="ml-0 mt-3 text-primary">
+                                        @subcomment.Author.FullName
+                                    </h6>
+                                </div>
+
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="media d-block d-sm-flex text-left p-4">
+                                        <img class="img-fluid d-md-flex mr-sm-4 rounded-circle" src="~Images/author10.jpg" alt="">
+                                        <div class="media-body align-self-center position-relative">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    @Html.Raw(subcomment.Content)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script src="~/js/select2.full.min.js"></script>
+    <script src="~/js/select2.script.js"></script>
+    @if ((!User.IsInRole("Demo User")) || (await _ticketsService.OwnsTicket(Model.Id)))
+    {
+        <script>
+        $('#sweet').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this ticket.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                        background: '#ffffed',
+                        html: '<p>The ticket was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                        icon: 'success',
+                        iconColor: 'gold',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+        </script>
+    }
+    else
+    {
+        <script>
+        $('#sweet').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this ticket.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                                text: 'Well not really since you are a demo user and a real user created this... but we can pretend it was!',
+                        background: '#ffffed',
+                        icon: 'success',
+                        iconColor: 'gold',
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#1c2020',
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+        </script>
+    }
+    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
+
+    <script>
+        document.querySelectorAll('.button').forEach(button => {
+
+            let duration = 3000,
+                svg = button.querySelectorAll('svg'),
+                svgPath = new Proxy({
+                    y: null,
+                    smoothing: null
+                }, {
+                    set(target, key, value) {
+                        target[key] = value;
+                        if (target.y !== null && target.smoothing !== null) {
+                            svg.innerHTML = getPath(target.y, target.smoothing, null);
+                        }
+                        return true;
+                    },
+                    get(target, key) {
+                        return target[key];
+                    }
+                });
+
+            button.style.setProperty('--duration', duration);
+
+            svgPath.y = 20;
+            svgPath.smoothing = 0;
+
+            button.addEventListener('click', e => {
+
+                e.preventDefault();
+
+                if (!button.classList.contains('loading')) {
+
+                    button.classList.add('loading');
+
+                    gsap.to(svgPath, {
+                        smoothing: .3,
+                        duration: duration * .065 / 1000
+                    });
+
+                    gsap.to(svgPath, {
+                        y: 12,
+                        duration: duration * .265 / 1000,
+                        delay: duration * .065 / 1000,
+                        ease: Elastic.easeOut.config(1.12, .4)
+                    });
+
+                    setTimeout(() => {
+                        svg.innerHTML = getPath(0, 0, [
+                            [3, 14],
+                            [8, 19],
+                            [21, 6]
+                        ]);
+                    }, duration / 2);
+
+                }
+
+            });
+
+        });
+
+        function getPoint(point, i, a, smoothing) {
+            let cp = (current, previous, next, reverse) => {
+                let p = previous || current,
+                    n = next || current,
+                    o = {
+                        length: Math.sqrt(Math.pow(n[0] - p[0], 2) + Math.pow(n[1] - p[1], 2)),
+                        angle: Math.atan2(n[1] - p[1], n[0] - p[0])
+                    },
+                    angle = o.angle + (reverse ? Math.PI : 0),
+                    length = o.length * smoothing;
+                return [current[0] + Math.cos(angle) * length, current[1] + Math.sin(angle) * length];
+            },
+                cps = cp(a[i - 1], a[i - 2], point, false),
+                cpe = cp(point, a[i - 1], a[i + 1], true);
+            return `C ${cps[0]},${cps[1]} ${cpe[0]},${cpe[1]} ${point[0]},${point[1]}`;
+        }
+
+        function getPath(update, smoothing, pointsNew) {
+            let points = pointsNew ? pointsNew : [
+                [4, 12],
+                [12, update],
+                [20, 12]
+            ],
+                d = points.reduce((acc, point, i, a) => i === 0 ? `M ${point[0]},${point[1]}` : `${acc} ${getPoint(point, i, a, smoothing)}`, '');
+            return `<path d="${d}" />`;
+        }
+    </script>
+}
+
+

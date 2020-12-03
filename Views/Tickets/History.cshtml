@@ -1,0 +1,325 @@
+﻿@model BugTracker.Models.Ticket
+
+
+<div class="row justify-content-center">
+    <h3>Most Recent to Oldest</h3>
+</div>
+<div class="row justify-content-center">
+    <a asp-action="Details" asp-route-id="@Model.Id" class="textButton">Back to Details</a>
+</div>
+<div class="row">
+    <div class="col-12  mt-3">
+        <ul class="timeline-app">
+            @foreach (var history in Model.Histories.Reverse())
+            {
+                if (history.Id % 2 == 0)
+                {
+                    <li class="col-12 col-md-6 mt-3 timeline-item">
+                        <div class="timeline-dot bg-primary" style="z-index: 1">
+                            <img src="~/img/BeeKeepLogo.svg" style="height:70px; width:70px; margin-top:-38px; margin-left:-19px"/>
+                        </div>
+                        <div class="card" style="background-color: #101414; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">
+                            <div class="card-body">
+                                <div class="text-left" style="margin-top: -20px; margin-left:-25px">
+                                    <span class="bg-primary text-uppercase text-white py-2 px-3 rounded" style="box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">@history.Created.ToString("f")</span>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mt-3">Changes made by @history.User.FullName</p>
+                                </div>
+                                <div class="row timeline position-relative">
+                                    <div class="col-12 col-md-6 text-left text-lg-right">
+                                        <div class="py-0 py-xl-2">
+                                            @if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) != !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.OldDeveloperValue was removed from this Ticket and has been replaced by @history.NewDeveloperValue</span>
+                                                </p>
+                                            }
+                                            else if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) == !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.DeveloperAssigned was left unchanged</span>
+                                                </p>
+                                            }
+                                            else if (string.IsNullOrWhiteSpace(history.OldDeveloperValue) && !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.NewDeveloperValue has been assigned to this Ticket</span>
+                                                </p>
+                                            }
+                                            else if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) && string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.OldDeveloperValue has been removed from this Ticket and a new Developer assignment is needed.</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Developer Assigned</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">None</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pt-2 mt-0">
+                                            <div class="timeline-point timeline-point2  position-relative"></div>
+                                            @if (history.NewTitleValue != history.OldTitleValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Title Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketTitle changed from "@history.OldTitleValue" to "@history.NewTitleValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Title</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketTitle was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 text-left text-lg-right">
+                                        <div class="py-0 py-xl-2">
+                                            @if (history.NewDescriptionValue != history.OldDescriptionValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketDescription Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketDescription changed from "@history.OldDescriptionValue" to "@history.NewDescriptionValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Description</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketDescription was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pt-2 mt-0">
+                                            <div class="timeline-point timeline-point2  position-relative"></div>
+                                            @if (history.NewTypeValue != history.OldTypeValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketType Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketType changed from "@history.OldTypeValue" to "@history.NewTypeValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Type</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketType was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 text-left text-lg-right">
+                                        <div class="py-0 py-xl-2">
+                                            @if (history.NewPriorityValue != history.OldPriorityValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketPriority Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketPriority changed from "@history.OldPriorityValue" to "@history.NewPriorityValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Priority</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketPriority was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pt-2 mt-0">
+                                            <div class="timeline-point timeline-point2  position-relative"></div>
+                                            @if (history.NewStatusValue != history.OldStatusValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketStatus Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketStatus changed from "@history.OldStatusValue" to "@history.NewStatusValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Status</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketStatus was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+                else
+                {
+                    <li class="col-12 col-md-6 mt-3 timeline-item reverse">
+                        <div class="timeline-dot bg-primary" style="z-index: 1;">
+                            <img src="~/img/BeeKeepLogo.svg" style="height:70px; width:70px; margin-top:-38px; margin-left:-19px;" />
+                        </div>
+                        <div class="card" style="background-color: #101414; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">
+                            <div class="card-body">
+                                <div class="text-left" style="margin-top: -20px; margin-left:-25px">
+                                    <span class="bg-primary text-uppercase text-white py-2 px-3 rounded" style="box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">@history.Created.ToString("f")</span>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mt-3">Changes made by @history.User.FullName</p>
+                                </div>
+                                <div class="row timeline position-relative">
+                                    <div class="col-12 col-md-6 text-left text-lg-right">
+                                        <div class="py-0 py-xl-2">
+                                            @if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) != !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.OldDeveloperValue was removed from this Ticket and has been replaced by @history.NewDeveloperValue</span>
+                                                </p>
+                                            }
+                                            else if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) == !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.DeveloperAssigned was left unchanged</span>
+                                                </p>
+                                            }
+                                            else if (string.IsNullOrWhiteSpace(history.OldDeveloperValue) && !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.NewDeveloperValue has been assigned to this Ticket</span>
+                                                </p>
+                                            }
+                                            else if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) && string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.OldDeveloperValue has been removed from this Ticket and a new Developer assignment is needed.</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Developer Assigned</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">None</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pt-2 mt-0">
+                                            <div class="timeline-point timeline-point2  position-relative"></div>
+                                            @if (history.NewTitleValue != history.OldTitleValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Title Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketTitle changed from "@history.OldTitleValue" to "@history.NewTitleValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Title</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketTitle was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 text-left text-lg-right">
+                                        <div class="py-0 py-xl-2">
+                                            @if (history.NewDescriptionValue != history.OldDescriptionValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketDescription Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketDescription changed from "@history.OldDescriptionValue" to "@history.NewDescriptionValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Description</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketDescription was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pt-2 mt-0">
+                                            <div class="timeline-point timeline-point2  position-relative"></div>
+                                            @if (history.NewTypeValue != history.OldTypeValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketType Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketType changed from "@history.OldTypeValue" to "@history.NewTypeValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Type</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketType was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 text-left text-lg-right">
+                                        <div class="py-0 py-xl-2">
+                                            @if (history.NewPriorityValue != history.OldPriorityValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketPriority Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketPriority changed from "@history.OldPriorityValue" to "@history.NewPriorityValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Priority</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketPriority was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pt-2 mt-0">
+                                            <div class="timeline-point timeline-point2  position-relative"></div>
+                                            @if (history.NewStatusValue != history.OldStatusValue)
+                                            {
+                                                <span class="text-uppercase text-primary d-block">@history.TicketStatus Change</span>
+                                                <p>
+                                                    <span class="font-weight-bold">@history.TicketStatus changed from "@history.OldStatusValue" to "@history.NewStatusValue"</span>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-uppercase text-primary d-block">Status</span>
+                                                <p>
+                                                    <span class="font-weight-bold text-muted">@history.TicketStatus was left unchanged</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                }
+
+            }
+
+        </ul>
+    </div>
+</div>

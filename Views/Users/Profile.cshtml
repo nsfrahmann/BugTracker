@@ -1,0 +1,598 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<BTUser> UserManager
+@inject BugTracker.Services.IBTAttachmentsService _attachmentsService
+@inject BugTracker.Services.IBTTicketsService _ticketsService
+@inject BugTracker.Services.IBTProjectsService _projectsService
+@model BugTracker.Models.Profile
+
+@{
+    var userId = UserManager.GetUserId(User);
+    var user = await UserManager.GetUserAsync(User);
+    var userAdmin = await UserManager.IsInRoleAsync(user, "Administrator");
+    var userPM = await UserManager.IsInRoleAsync(user, "Project Manager");
+    var userDev = await UserManager.IsInRoleAsync(user, "Developer");
+    var userSub = await UserManager.IsInRoleAsync(user, "Submitter");
+    var userDemo = await UserManager.IsInRoleAsync(user, "Demo User");
+    var userNew = await UserManager.IsInRoleAsync(user, "New User");
+    var ticketCount = await _ticketsService.GetUserTicketCount(userId);
+    var projectCount = await _projectsService.GetUserProjectCount(userId);
+}
+
+@section css{
+    <style>
+        .my-font {
+            font-size: 1rem
+        }
+        img.circle {
+            -moz-border-radius: 150px/150px;
+            -webkit-border-radius: 150px 150px;
+            border-radius: 150px/150px;
+            width: 150px;
+            height: 150px;
+        }
+    </style>
+}
+
+
+@if (Model.Avatar == null && Model.BannerImage == null && Model.Bio == null && user == Model.User)
+{
+    <div class="container-fluid site-width mb-5">
+
+        <div class="row">
+            <div class="col-12 text-center mt-5 mb-5">
+                <h1 class="greeting text-white mt-5">Looks like you need a profile</h1>
+                <h2 class="userName">@user.FirstName</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div>
+            <div class="ico animated">
+                <div class="circle circle-top"></div>
+                <div class="circle circle-main"></div>
+                <div class="circle circle-bottom"></div>
+
+                <svg class="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+                <defs>
+                <clipPath id="cut-off-arrow">
+                <circle cx="306" cy="306" r="287" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    </clipPath>
+    
+                <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <feBlend in="SourceGraphic" in2="goo" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    </filter>
+   
+                                </defs>
+                <path class="st-arrow" d="M317.5,487.6c0.3-0.3,0.4-0.7,0.7-1.1l112.6-112.6c6.3-6.3,6.3-16.5,0-22.7c-6.3-6.3-16.5-6.3-22.7,0
+				                    l-86,86V136.1c0-8.9-7.3-16.2-16.2-16.2c-8.9,0-16.2,7.3-16.2,16.2v301.1l-86-86c-6.3-6.3-16.5-6.3-22.7,0
+				                    c-6.3,6.3-6.3,16.5,0,22.7l112.7,112.7c0.3,0.3,0.4,0.7,0.7,1c0.5,0.5,1.2,0.5,1.7,0.9c1.7,1.4,3.6,2.3,5.6,2.9
+				                    c0.8,0.2,1.5,0.4,2.3,0.4C308.8,492.6,313.8,491.3,317.5,487.6z" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            </svg>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-5">
+        <button data-toggle="modal" data-target="#createProfileModal" class="btn btn-secondary"><h3>Create My Profile</h3></button>
+    </div>
+
+
+    <div class="modal fade" id="createProfileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="background-color:#1c2020">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:gold">@Model.User.FirstName's Profile</h5>
+                    <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="overflow: scroll;">
+                    <div class="col" style="width:100%">
+                        <form asp-controller="Users" asp-action="Profile" enctype="multipart/form-data" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="@Model.UserId" />
+                            <input type="hidden" asp-for="@Model.Created" />
+                            <div class="form-group">
+                                <label class="control-label text-white">Biography</label>
+                                <input name="Bio" class="form-control tiny" />
+                                <span asp-validation-for="@Model.Bio" class="text-danger"></span>
+                            </div>
+                            <div class="custom-file-upload" style="margin-top: -5px">
+                                <label class="control-label text-white">Avatar</label>
+                                <input type="file" id="file" name="Avatar" />
+                            </div>
+                            <div class="custom-file-upload mt-3">
+                                <label class="control-label text-white">Banner Image</label>
+                                <input type="file" id="file" name="BannerImage" />
+                            </div>
+                            <div class="form-group mt-3">
+                                <input type="submit" value="Create" class="btn btn-secondary" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (Model.Avatar == null && Model.BannerImage == null && Model.Bio == null && user != Model.User)
+{
+    <div class="container-fluid site-width mb-5">
+
+        <div class="row">
+            <div class="col-12 text-center mt-5 mb-5">
+                <h1 class="greeting text-white mt-5">Looks like your friend hasn't set up their profile yet...</h1>
+                <h2 class="userName text-white">Maybe you should remind them!</h2>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12 mt-3">
+            <div class="position-relative">
+                <div class="background-image-maker py-5" style="position:relative"><img src="@_attachmentsService.DecodeAttachment(Model.BannerData, Model.BannerName)" style="position: absolute; height: 200px; width: 100%; object-fit: cover" /></div>
+                <div class="holder-image">
+                    <img src="" alt="" class="img-fluid d-none" />
+                </div>
+                <div class="position-relative px-3 py-5">
+
+                    <div class="media d-md-flex d-block">
+                        <img src="@_attachmentsService.DecodeAttachment(Model.AvatarData, Model.AvatarName)" class="img-fluid circle" style="object-fit: cover; margin-top: -60px; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);" />
+                        <div class="media-body z-index-1">
+                            <div class="pl-4">
+                                <div class="row">
+                                    <h1 class="card col-auto display-4 text-uppercase text-white mb-0 ml-4" style="background-color: #101414;color:gold !important;margin-top: -40px; border-radius: 1rem; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">
+                                        @Model.User.FullName
+                                        <div class="mb-2" style="margin-top: -40px;">
+                                            @if (userAdmin == true)
+                                            {
+                                                <span class="text-uppercase text-white mb-0 my-font">
+                                                    <b>
+                                                        @if (userDemo == true)
+                                                        {<span>Demo</span>} Administrator
+                                                    </b>
+                                                </span>
+                                            }
+                                            @if (userPM == true)
+                                            {
+                                                <span class="text-uppercase text-white mb-0 my-font">
+                                                    <b>
+                                                        @if (userDemo == true)
+                                                        {<span>Demo</span>} Project Manager
+                                                    </b>
+                                                </span>
+                                            }
+                                            @if (userDev == true)
+                                            {
+                                                <span class="text-uppercase text-white mb-0 my-font">
+                                                    <b>
+                                                        @if (userDemo == true)
+                                                        {<span>Demo</span>} <b>Developer</b>
+                                                    </b>
+                                                </span>
+                                            }
+                                            @if (userSub == true)
+                                            {
+                                                <span class="text-uppercase text-white mb-0 my-font">
+                                                    <b>
+                                                        @if (userDemo == true)
+                                                        {<span>Demo</span>} Submitter
+                                                    </b>
+                                                </span>
+                                            }
+                                            @if (userNew == true)
+                                            {
+                                                <span class="text-uppercase text-white mb-0 my-font"><b>New User</b></span>
+                                            }
+
+                                            <span class="ml-3 text-white my-font">Contact: <span class="text-lowercase">@Model.User.Email</span></span>
+                                            <a href="#" data-toggle="modal" data-target="#editProfileModal" style="font-size: 1.2rem"><i class="pl-1 icon-pencil icons"></i></a>
+                                        </div>
+                                    </h1>
+                                    <div class="col"></div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                    <div class="modal-content" style="background-color:#1c2020">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel" style="color:gold">@Model.User.FirstName's Profile</h5>
+                            <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="overflow: scroll;">
+                            <div class="col" style="width:100%">
+                                <form asp-controller="Users" asp-action="Profile" enctype="multipart/form-data" method="post">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <input type="hidden" asp-for="@Model.UserId" />
+                                    <input type="hidden" asp-for="@Model.Created" />
+                                    <input type="hidden" asp-for="@Model.Updated" />
+                                    <div class="form-group">
+                                        <label class="control-label text-white">Change Biography</label>
+                                        <input name="Bio" value="@Model.Bio" class="form-control tiny" />
+                                        <span asp-validation-for="@Model.Bio" class="text-danger"></span>
+                                    </div>
+                                    <div class="custom-file-upload" style="margin-top: -5px">
+                                        <label class="control-label text-white">Change Avatar</label>
+                                        <input type="file" id="file" name="Avatar" />
+                                    </div>
+                                    <div class="custom-file-upload mt-3">
+                                        <label class="control-label text-white">Change Banner Image</label>
+                                        <input type="file" id="file" name="BannerImage" />
+                                    </div>
+                                    <div class="form-group mt-3">
+                                        <input type="submit" value="Create" class="btn btn-secondary" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-3">
+                <div class="text-left">
+                    <span class="bg-primary text-uppercase text-white py-2 px-3 rounded ml-3" style="box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">Member Since - @Model.Created.ToString("dd MMM, yyyy")</span>
+                </div>
+                <div class="text-left">
+                    <span class="bg-primary text-uppercase text-white py-2 px-3 rounded ml-3" style="box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">Tickets Assigned - @ticketCount</span>
+                </div>
+                <div class="text-left">
+                    <span class="bg-primary text-uppercase text-white py-2 px-3 rounded ml-3" style="box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);">Projects Assigned - @projectCount</span>
+                </div>
+            </div>
+
+            <div class="profile-menu mt-5 theme-background border col-12 z-index-1 p-2" style="background-color: #101414;">
+                <div class="d-sm-flex" style="position:relative">
+                    <div class="align-self-center col-10">
+                        <div class="ml-1 mt-2"><h4 class="ml-3">Here's a little about @Model.User.FirstName</h4></div>
+                        <div class="ml-3 mt-3"><h5 class="ml-5" style="word-wrap: break-word">@Html.Raw(Model.Bio)</h5></div>
+                    </div>
+                    <div class="row" style="width: 100px; position:absolute ; top: 7%; left: 85%">
+                        <a href="#">
+                            <i class="icon-social-dropbox h5"></i>
+                        </a>
+                        <a href="#">
+                            <i class="icon-social-facebook h5"></i>
+                        </a>
+                        <a href="#">
+                            <i class="icon-social-github h5"></i>
+                        </a>
+                        <a href="#">
+                            <i class="icon-social-google h5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
