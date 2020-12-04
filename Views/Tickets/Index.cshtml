@@ -4,11 +4,19 @@
 
 @{
     ViewData["Title"] = "Index";
+
 }
 
 <div class="row pt-5 mb-3 ml-1">
     <div class="card col-auto" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
-        <h3 class="mt-1" style="color:gold;">Active Tickets<a asp-controller="Tickets" asp-action="Create" data-toggle="modal" data-target="#createTicketModal"><i class="icon-plus icons ml-3" style="font-size: 1.2rem"></i></a></h3>
+        <h3 class="mt-1" style="color:gold;">Active Tickets
+        
+        @if (!User.IsInRole("Basic User"))
+        {
+            <a asp-controller="Tickets" asp-action="Create" data-toggle="modal" data-target="#createTicketModal"><i class="icon-plus icons ml-3" style="font-size: 1.2rem"></i></a>
+        }
+        else { }
+        </h3>
     </div>
     <div class="col"></div>
 </div>
@@ -59,7 +67,7 @@
                     else
                     {
                         <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
-                            Pending Assignment...
+                            Pending...
                         </td>
                     }
                     @if (item.TicketStatusId != null)
@@ -71,7 +79,7 @@
                     else
                     {
                         <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
-                            Pending Assignment...
+                            Pending...
                         </td>
                     }
                     <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
@@ -87,18 +95,18 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
+                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
                     </td>
                     @if (item.DeveloperUser != null)
                     {
                         <td>
-                            <a href='/Users/Profile/@item.DeveloperUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px;"><span style="margin-left:3.5px;">@item.DeveloperUser.Initials</span></div>@item.DeveloperUser.FullName</a>
+                            <a href='/Users/Profile/@item.DeveloperUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.DeveloperUser.Initials</span></div>@item.DeveloperUser.FullName</a>
                         </td>
                     }
                     else
                     {
                         <td onclick="location.href='/Tickets/Details/@item.Id';" style="cursor: pointer;">
-                            Pending Assignment...
+                            Pending...
                         </td>
                     }
                     <td style="position:relative">
@@ -192,7 +200,7 @@
 @section Scripts{
     @foreach (var item in Model)
     {
-        @if ((!User.IsInRole("Demo User")) || (await _ticketsService.OwnsTicket(item.Id)))
+        @if ((!User.IsInRole("Demo User") && await _rolesService.CanInteractTicket(item.Id)) || (await _ticketsService.OwnsTicket(item.Id)))
         {
             <script>
         $('#sweet-@item.Id').click(function() {

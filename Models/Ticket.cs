@@ -22,9 +22,10 @@ namespace BugTracker.Models
         }
         public int Id { get; set; }
         [Required]
-        [StringLength(50)]
+        [StringLength(30)]
         public string Title { get; set; }
         [Required]
+        [StringLength(300)]
         public string Description { get; set; }
         [DataType(DataType.Date)]       
         public DateTimeOffset Created { get; set; }

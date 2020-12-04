@@ -25,7 +25,7 @@ namespace BugTracker.Models
         public string FullName { get { return $"{FirstName} {LastName}"; } }
         public char FirstLetter { get { return FirstName.ElementAt(0); } }
         public char LastLetter { get { return LastName.ElementAt(0); } }
-        public string Initials { get { return $"{FirstLetter + LastLetter}"; } }
+        public string Initials { get { return $"{FirstLetter}{LastLetter}"; } }
         public string AvatarName { get; set; }
         public byte[] AvatarData { get; set; }
         public string AvatarContentType { get; set; }

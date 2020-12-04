@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BugTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201203020019_initial")]
+    [Migration("20201204035322_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

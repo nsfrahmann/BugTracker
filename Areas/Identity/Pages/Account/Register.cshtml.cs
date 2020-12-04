@@ -112,7 +112,7 @@ namespace BugTracker.Areas.Identity.Pages.Account
                         UserId = user.Id,
                         Created = DateTime.Now
                     };
-                    await _rolesService.AddUserToRole(user, "New User");
+                    await _rolesService.AddUserToRole(user, "Basic User");
                     await _context.AddAsync(profile);
                     await _context.SaveChangesAsync();
 

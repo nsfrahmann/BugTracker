@@ -18,5 +18,6 @@ namespace BugTracker.Services
         public Project Project();
         public Task<int> GetUserProjectCount(string userId);
         public Task<bool> OwnsProject(int projectId);
+        public Task<BTUser> GetProjectUser(string userId);
     }
 }

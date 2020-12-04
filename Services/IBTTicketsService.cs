@@ -16,6 +16,8 @@ namespace BugTracker.Services
         //public Task<ICollection<BTUser>> UsersOnTicket(int ticketId);
         //public Task<ICollection<BTUser>> UsersNotOnTicket(int ticketId);
         public Task<int> GetTicketCount(int projectId);
+        public Task<int> GetAttachmentCount(int ticketId);
+        public Task<int> GetCommentCount(int ticketId);
         public Task<int> GetUserTicketCount(string userId);
         public Task<List<Ticket>> All();
         public Task<List<Ticket>> AssignedProjectTickets(string userId);
@@ -25,5 +27,8 @@ namespace BugTracker.Services
         public SelectList GetProjectSelect();
         public SelectList GetTicketTypeSelect();
         public Task<bool> OwnsTicket(int ticketId);
+        public Task<bool> OwnsAttachment(int attachmentId);
+        public Task<bool> OwnsComment(int commentId);
+        public Task<bool> OwnsSub(int subCommentId);
     }
 }

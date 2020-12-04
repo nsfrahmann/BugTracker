@@ -59,32 +59,45 @@ namespace BugTracker.Services
             return await _userManager.Users.Where(u => IsUserInRole(u, role.Name).Result == false).ToListAsync();
         }
 
-        public SelectList RoleSelect()
+        public async Task<SelectList> RoleSelect()
         {
-            var roles = new SelectList(_context.Roles, "Name", "Name");
-            return roles;
+            var thisUser = await _userManager.GetUserAsync(_httpContext.HttpContext.User);
+            if (await _userManager.IsInRoleAsync(thisUser, "Project Manager"))
+            {
+                var roles = await _context.Roles.Where(r => (r.Name != "Demo User") && (r.Name != "Administrator")).ToListAsync();
+                var roleSelect = new SelectList(roles, "Name", "Name");
+                return roleSelect;
+            }
+            else
+            {
+                var roles = await _context.Roles.Where(r => r.Name != "Demo User").ToListAsync();
+                var roleSelect = new SelectList(roles, "Name", "Name");
+                return roleSelect;
+            }
         }
 
-        public async Task<MultiSelectList> MultiUsersSelect()
+        public async Task<List<BTUser>> AllUsersSelect()
         {
-            var userLogged = _httpContext.HttpContext.User;
-            var userId = _userManager.GetUserId(userLogged);
-            var thisUser = _context.Users.Find(userId);
-            var totalUsers = _context.Users.Where(u => u.Id != thisUser.Id).ToList();
-            var demo = _context.Roles.FirstOrDefault(r => r.Name == "Demo User");
 
-            var totalSelect = new List<SelectListItem>();
+            var thisUser = await _userManager.GetUserAsync(_httpContext.HttpContext.User);
+            var totalUsers = _context.Users.Where(u => u.Id != thisUser.Id).ToList();
+            var selectOptions = new List<BTUser>();
+
             foreach (var user in totalUsers)
             {
                 if (!(await _userManager.IsInRoleAsync(user, "Demo User")))
                 {
-                    totalSelect.Add(new SelectListItem() { Text = user.FullName, Value = user.Id });
+                    if ((await _userManager.IsInRoleAsync(thisUser, "Project Manager")) && (await _userManager.IsInRoleAsync(user, "Administrator")))
+                    {
+                    }
+                    else
+                    {
+                        selectOptions.Add(user);
+                    }
                 }
             }
 
-            var userSelect = new MultiSelectList(totalSelect, "Value", "Text");
-
-            return userSelect;
+            return selectOptions;
         }
 
         public async Task<bool> CanInteractProject(int projectId)
@@ -100,13 +113,27 @@ namespace BugTracker.Services
                     return true;
                 case "Project Manager":
                     var onProject = _context.Projects.Find(projectId).ProjectUserIds;
-                    if (await _context.Projects.Where(p => p.OwnerUserId == userId || onProject.Contains(userId)).AnyAsync())
+                    if (onProject != null)
                     {
-                        return true;
+                        if (await _context.Projects.Where(p => p.OwnerUserId == userId || onProject.Contains(userId)).AnyAsync())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                     else
                     {
-                        return false;
+                        if (await _context.Projects.Where(p => p.OwnerUserId == userId).AnyAsync())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 default:
                     return false;
@@ -129,21 +156,37 @@ namespace BugTracker.Services
                 case "Project Manager":
                     var projectId = _context.Tickets.Find(ticketId).ProjectId;
                     var onProject = _context.Projects.Find(projectId).ProjectUserIds;
-                    if (await _context.Projects.Where(p => p.OwnerUserId == userId || onProject.Contains(userId)).AnyAsync())
+                    if (onProject != null)
                     {
-                        result = true;
-                        break;
+                        if (await _context.Projects.Where(p => p.OwnerUserId == userId || onProject.Contains(userId)).AnyAsync())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
-                    break;
+                    else
+                    {
+                        if (await _context.Projects.Where(p => p.OwnerUserId == userId).AnyAsync())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                 case "Developer":
-                    if (await _context.Tickets.Where(t => t.Id == ticketId && (t.DeveloperUserId == userId || t.OwnerUserId == userId)).AnyAsync())
+                    if (await _context.Tickets.Where(t => t.Id == ticketId && (t.DeveloperUserId == thisUser.Id || t.OwnerUserId == thisUser.Id)).AnyAsync())
                     {
                         result = true;
                         break;
                     }
                     break;
                 case "Submitter":
-                    if (await _context.Tickets.Where(t => t.Id == ticketId && (t.OwnerUserId == userId || t.DeveloperUserId == userId)).AnyAsync())
+                    if (await _context.Tickets.Where(t => t.Id == ticketId && (t.OwnerUserId == thisUser.Id || t.DeveloperUserId == thisUser.Id)).AnyAsync())
                     {
                         result = true;
                         break;

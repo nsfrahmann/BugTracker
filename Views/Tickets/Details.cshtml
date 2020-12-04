@@ -9,14 +9,26 @@
 
 @{
     ViewData["Title"] = "Details";
+
+    TempData["IdForSub"] = Model.Id;
+    var userLogged = await UserManager.GetUserAsync(User);
 }
 @section css{
     <link href="~/css/select2.min.css" rel="stylesheet" />
     <link href="~/css/select2-bootstrap.min.css" rel="stylesheet" />
     <link href="~/css/downloadbtn.css" rel="stylesheet" />
 
-}
+    <style>
+        #single-select {
+            min-height: 40px;
+            border-radius: .2rem
+        }
 
+        #select-contain {
+            height: 50px !important;
+        }
+    </style>
+}
 
 <div class="row">
 
@@ -169,7 +181,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-2 ml-auto">
-                                    @if ((!User.IsInRole("Demo User")) || (User.IsInRole("Demo User") && await _ticketsService.OwnsTicket(Model.Id)))
+                                    @if ((!User.IsInRole("Demo User") && await _rolesService.CanInteractTicket(Model.Id)) || await _ticketsService.OwnsTicket(Model.Id))
                                     {
                                         <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -216,9 +228,12 @@
                     }
                 </dl>
 
-                @if ((await _projectsService.UsersOnProject(Model.ProjectId) != null))
+                @if ((await _projectsService.UsersOnProject(Model.ProjectId)) != null)
                 {
-                    <button name="TicketAssign" value="TicketAssign" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary mb-2 ml-2">Assign to Ticket</button>
+                    @if (await _rolesService.CanInteractTicket(Model.Id))
+                    {
+                        <button name="TicketAssign" value="TicketAssign" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary mb-2 ml-2">Assign to Ticket</button>
+                    }
                 }
             </div>
         </div>
@@ -234,30 +249,90 @@
                     </button>
                 </div>
                 <div class="modal-body" style="overflow: scroll;">
-                    <div class="col" style="width:100%">
-                        <form asp-action="Edit" asp-route-id="@Model.Id">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="Title" />
-                            <input type="hidden" asp-for="Description" />
-                            <input type="hidden" asp-for="TicketTypeId" />
-                            <input type="hidden" asp-for="TicketStatusId" />
-                            <input type="hidden" asp-for="TicketPriorityId" />
-                            <input type="hidden" asp-for="OwnerUserId" />
-                            <input type="hidden" asp-for="ProjectId" />
-                            <input type="hidden" asp-for="Created" />
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card-body form-group">
-                                        <select asp-for="@Model.DeveloperUserId" asp-items="@ViewBag.TicketDevs" name="selectedUsers" class="col-12" data-allow-clear="1">
-                                        </select>
+                    <div class="col select-target">
+                        @if (Model.Project.ProjectUserIds != null)
+                        {
+                            <form asp-action="Edit" asp-route-id="@Model.Id">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" asp-for="Title" />
+                                <input type="hidden" asp-for="Description" />
+                                <input type="hidden" asp-for="TicketTypeId" />
+                                <input type="hidden" asp-for="TicketStatusId" />
+                                <input type="hidden" asp-for="TicketPriorityId" />
+                                <input type="hidden" asp-for="OwnerUserId" />
+                                <input type="hidden" asp-for="ProjectId" />
+                                <input type="hidden" asp-for="Created" />
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card-body form-group">
+                                            <label class="text-white">Select or search for one user to assign this ticket</label>
+                                            <select id="single-select" asp-for="@Model.DeveloperUserId" name="selectedUsers" class="col-12" data-allow-clear="1">
+                                                @if (!await UserManager.IsInRoleAsync(userLogged, "Project Manager"))
+                                                {
+                                                    <optgroup class="text-center" label="Administrators">Administrators</optgroup>
+                                                    @foreach (var userid in Model.Project.ProjectUserIds)
+                                                    {
+                                                        var thisUser = await _projectsService.GetProjectUser(userid);
+                                                        if ((await UserManager.IsInRoleAsync(thisUser, "Administrator") == true))
+                                                        {
+                                                            <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                        }
+                                                        else { }
+                                                    }
+                                                }
+                                                <optgroup label="Project Managers">Project Managers</optgroup>
+                                                @foreach (var userid in Model.Project.ProjectUserIds)
+                                                {
+                                                    var thisUser = await _projectsService.GetProjectUser(userid);
+                                                    if ((await UserManager.IsInRoleAsync(thisUser, "Project Manager") == true))
+                                                    {
+                                                        <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                    }
+                                                    else { }
+                                                }
+                                                <optgroup label="Developers">Developers</optgroup>
+                                                @foreach (var userid in Model.Project.ProjectUserIds)
+                                                {
+                                                    var thisUser = await _projectsService.GetProjectUser(userid);
+                                                    if ((await UserManager.IsInRoleAsync(thisUser, "Developer") == true))
+                                                    {
+                                                        <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                    }
+                                                    else { }
+                                                }
+                                                <optgroup label="Submitters">Submitters</optgroup>
+                                                @foreach (var userid in Model.Project.ProjectUserIds)
+                                                {
+                                                    var thisUser = await _projectsService.GetProjectUser(userid);
+                                                    if ((await UserManager.IsInRoleAsync(thisUser, "Submitter") == true))
+                                                    {
+                                                        <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                    }
+                                                    else { }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div style="position:fixed; bottom: 35%; left:70%">
+                                        @if ((!User.IsInRole("Demo User") && await _rolesService.CanInteractTicket(Model.Id)) || await _ticketsService.OwnsTicket(Model.Id))
+                                        {
+                                            <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" data-toggle="popover" title="Nice Try!" data-content="You're not a real user yet, so you can't tell other people what to do (unless you create your own ticket)." class="btn btn-secondary btn-md mr-2">Save</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        }
                                     </div>
                                 </div>
-                                <div class="mb-2 ml-auto">
-                                    <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        }
+                        else
+                        {
+                            <h3 class="text-center mt-5">You're gonna need to assign some people to the project that<br /> this ticket belongs to before you assign someone here.</h3>
+                            <a asp-controller="Projects" asp-action="Details" asp-route-id="@Model.ProjectId" class="btn btn-secondary" style="position:absolute; bottom:40%; left:45%;">Do it now!</a>
+                        }
                     </div>
                 </div>
             </div>
@@ -270,12 +345,21 @@
 
 <div class="row mt-3">
     <div class="col-10 offset-1">
-        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
-            <h3 class="mt-2" style="color:gold;">Associated Attachments<button data-toggle="modal" data-target="#addAttachmentModal" class="textButton2"><i class="icon-plus icons ml-3" style="font-size: 1.2rem;"></i></button></h3>
+        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem;">
+            <h3 class="mt-2" style="color:gold;">
+                Associated Attachments
+
+                @if (await _rolesService.CanInteractTicket(Model.Id) || await _ticketsService.OwnsTicket(Model.Id))
+                {
+                    <button data-toggle="modal" data-target="#addAttachmentModal" class="textButton2"><i class="icon-plus icons ml-3" style="font-size: 1.2rem;"></i></button>
+                }
+                else { }
+
+            </h3>
 
             @if (Model.Attachments.Any())
             {
-                <dl class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2)">
+                <dl class="row mb-0" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2); max-height: 200px; overflow-y:scroll">
                     @foreach (TicketAttachment item in Model.Attachments)
                     {
                         <dd class="mt-3 ml-3 mr-4 text-center">
@@ -303,11 +387,24 @@
                                         <a download="@System.IO.Path.GetFileName(item.FileName)" href="@_attachmentsService.DecodeAttachment(item.FileData, item.FileName)" type="submit" class="mt-2 ml-2 mb-2 mr-2 textButton2"><i class="icon-cloud-download icons"></i></a>
                                     </form>
                                 </div>
-                                <div class="dark justify-content-center ml-3">
-                                    <form asp-action="AttachmentDelete" asp-route-id="@item.Id" method="post">
-                                        <button type="submit" class="mt-2 mb-2 ml-2 textButton2"><i class="icon-trash icons"></i></button>
-                                    </form>
-                                </div>
+                                @if (await _rolesService.CanInteractTicket(item.TicketId))
+                                {
+                                    @if (!User.IsInRole("Demo User") || await _ticketsService.OwnsAttachment(item.Id))
+                                    {
+                                        <div class="dark justify-content-center ml-3">
+                                            <form asp-action="AttachmentDelete" asp-route-id="@item.Id" method="post">
+                                                <button type="submit" class="mt-2 mb-2 ml-2 textButton2"><i class="icon-trash icons"></i></button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="dark justify-content-center ml-3">
+                                            <button type="button" data-toggle="popover" title="Nice Try!" data-placement="bottom" data-content="You're not a real user yet, so you can't delete an attachment that you didn't add." class="mt-2 mb-2 ml-2 textButton2"><i class="icon-trash icons"></i></button>
+                                        </div>
+                                    }
+                                }
+                                else { }
                             </div>
                         </dd>
                     }
@@ -330,15 +427,21 @@
             <div class="modal-body" style="overflow: scroll;">
                 <div class="col" style="width:100%">
                     <form asp-controller="Tickets" asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data">
-                        <input type="hidden" asp-for="ProjectId" />
-                        <input type="hidden" asp-for="OwnerUserId" />
-                        <input type="hidden" asp-for="DeveloperUserId" />
-                        <input type="hidden" asp-for="Created" />
-                        <input type="hidden" asp-for="Title" />
-                        <input type="hidden" asp-for="Description" />
-                        <input type="hidden" asp-for="TicketTypeId" />
-                        <input type="hidden" asp-for="TicketStatusId" />
-                        <input type="hidden" asp-for="TicketPriorityId" />
+                        <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+                        <input type="hidden" name="OwnerUserId" value="@Model.OwnerUserId" />
+                        <input type="hidden" name="DeveloperUserId" value="@Model.DeveloperUserId" />
+                        <input type="hidden" name="Created" value="@Model.Created" />
+                        <input type="hidden" name="Title" value="@Model.Title" />
+                        <input type="hidden" name="Description" value="@Model.Description" />
+                        <input type="hidden" name="TicketTypeId" value="@Model.TicketTypeId" />
+                        @if (Model.TicketPriority != null)
+                        {
+                            <input type="hidden" name="TicketPriorityId" value="@Model.TicketPriorityId" />
+                        }
+                        @if (Model.TicketStatus != null)
+                        {
+                            <input type="hidden" name="TicketStatusId" value="@Model.TicketStatusId" />
+                        }
 
                         <div class="custom-file-upload mb-3" style="margin-top: -5px">
                             <label class="control-label text-white">Attachments</label>
@@ -356,48 +459,103 @@
     </div>
 </div>
 
-<div class="row mt-3">
-    <div class="col-10 offset-1">
-        <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
-            <h3 class="mt-2" style="color:gold;">Create a Comment<button data-toggle="collapse" data-target="#collapseComment" aria-expanded="true" aria-controls="collapseOne" class="textButton2"><i class="icon-plus icons ml-3" style="font-size: 1.2rem;"></i></button></h3>
-            <div id="collapseComment" class="collapse row mb-0 justify-content-center" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2);">
-                <form asp-controller="TicketComments" asp-action="CreateCom" style="width:100%">
-                    @Html.Hidden("TicketId", Model.Id)
-                    @Html.Hidden("AuthorId", UserManager.GetUserId(User))
-                    <div class="col-12 mt-1">
-                        <div class="form-group">
-                            <input name="commentContent" class="tiny form-control" />
+@if ((await _rolesService.CanInteractTicket(Model.Id)) || (await _ticketsService.OwnsTicket(Model.Id)))
+{
+    <div class="row mt-3">
+        <div class="col-10 offset-1">
+            <div class="card col-12" style="background-color:#101414; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
+                <h3 class="mt-2" style="color:gold;">Create a Comment<button data-toggle="collapse" data-target="#collapseComment" aria-expanded="true" aria-controls="collapseOne" class="textButton2"><i class="icon-plus icons ml-3" style="font-size: 1.2rem;"></i></button></h3>
+                <div id="collapseComment" class="collapse row mb-0 justify-content-center" style="background-color: #1c2020; border-radius: 0 0 1rem 1rem; border-top: 1px solid rgba(255,215,0,.2);">
+                    <form asp-controller="TicketComments" asp-action="CreateCom" style="width:100%">
+                        @Html.Hidden("TicketId", Model.Id)
+                        @Html.Hidden("AuthorId", UserManager.GetUserId(User))
+                        <div class="col-12 mt-1">
+                            <div class="form-group">
+                                <input name="commentContent" class="tiny form-control" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-12 ml-3">
-                        <button type="submit" class="btn btn-secondary btn-md" style=" margin-top: -100px">Submit Comment</button>
-                    </div>
-                </form>
+                        <div class="col-12 ml-3">
+                            <button type="submit" class="btn btn-secondary btn-md" style=" margin-top: -100px">Submit Comment</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+
 @foreach (var comment in Model.TicketComments)
 {
+    <form id="delete-@comment.Id" asp-controller="TicketComments" asp-action="DeleteCom" asp-route-id="@comment.Id" method="post"></form>
+
     <div class="row mt-3">
         <div class="col-8 offset-1">
             <div class="card col-12" style="background-color:#1c2020; color: #fff; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); border-radius: 1rem">
                 <div class="card-body pb-0">
-                    <h5 class="header-title mb-0 text-primary">@comment.Author.FullName</h5>
+                    <h5 class="header-title mb-0 text-primary">
+                        @comment.Author.FullName
+
+                        @if (await _ticketsService.OwnsComment(comment.Id) || User.IsInRole("Admininstrator") || (User.IsInRole("Project Manager") && await _rolesService.CanInteractTicket(Model.Id)))
+                        {
+                            <a href="#" data-toggle="modal" data-target="#editCommentModal-@comment.Id" style="font-size: 1rem"><i class="pl-3 icon-pencil icons"></i></a>
+                            <a href="#" id="sweet-@comment.Id" style="font-size: 1rem"><i class="pl-1 icon-trash icons"></i></a>
+                        }
+
+                    </h5>
+
                 </div>
+
+                <div class="modal fade" id="editCommentModal-@comment.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content" style="background-color:#1c2020">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Make some changes</h5>
+                                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="overflow: scroll;">
+                                <div class="col" style="width:100%">
+                                    <form asp-controller="TicketComments" asp-action="EditCom" asp-route-id="@comment.Id">
+                                        @Html.Hidden("TicketId", Model.Id)
+                                        @Html.Hidden("AuthorId", UserManager.GetUserId(User))
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <input value="@comment.Content" name="commentContent" class="form-control tiny" />
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 ml-auto">
+                                                <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <hr />
                 <div class="media d-block d-sm-flex text-left p-4">
                     <img class="img-fluid d-md-flex mr-sm-4 rounded-circle" src="~Images/author10.jpg" alt="">
                     <div class="media-body align-self-center position-relative">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-10" style="word-wrap: break-word; word-break:break-word">
                                 @Html.Raw(comment.Content)
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-3 offset-9">
                                 <div class="float-sm-right float-none h6 mb-0 my-3 my-sm-0">
-                                    <a data-toggle="modal" data-target="#exampleModal-@comment.Id" class="text-primary position-absolute mr-2 my-reply" style="cursor: pointer; bottom: 0; right: 0;"><i class="icofont icofont-bubble-left pr-1"></i> Reply</a>
+
+                                    @if (await _rolesService.CanInteractTicket(Model.Id) || await _ticketsService.OwnsTicket(Model.Id))
+                                    {
+                                        <a data-toggle="modal" data-target="#exampleModal-@comment.Id" class="text-primary position-absolute mr-2 my-reply" style="cursor: pointer; bottom: 0; right: 0;"><i class="icofont icofont-bubble-left pr-1"></i> Reply</a>
+                                    }
+
                                 </div>
                             </div>
                         </div>
@@ -438,6 +596,9 @@
 
                 @foreach (var subcomment in comment.TicketSubComments)
                 {
+                    <form id="delete-@subcomment.Id" asp-controller="TicketComments" asp-action="DeleteSub" asp-route-id="@subcomment.Id" asp-route-foo="@comment.Id" method="post"></form>
+
+
                     <div class="row mt-3">
                         <div class="col-1 ml-2"></div>
                         <div class="card col-11 mr-5" style="box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.8); transition: 0.3s; background-color:#101414; margin-left: -20px;">
@@ -448,8 +609,48 @@
                                 <div class="col-5">
                                     <h6 class="ml-0 mt-3 text-primary">
                                         @subcomment.Author.FullName
+
+                                        @if (await _ticketsService.OwnsSub(subcomment.Id) || User.IsInRole("Admininstrator") || (User.IsInRole("Project Manager") && await _rolesService.CanInteractTicket(Model.Id)))
+                                        {
+                                            <a href="#" data-toggle="modal" data-target="#editSubModal-@subcomment.Id" style="font-size: 1rem"><i class="pl-3 icon-pencil icons"></i></a>
+                                            <a href="#" id="sweet-@subcomment.Id" style="font-size: 1rem"><i class="pl-1 icon-trash icons"></i></a>
+                                        }
+
                                     </h6>
                                 </div>
+
+                                <div class="modal fade" id="editSubModal-@subcomment.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                                        <div class="modal-content" style="background-color:#1c2020">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Make some changes</h5>
+                                                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body" style="overflow: scroll;">
+                                                <div class="col" style="width:100%">
+                                                    <form asp-controller="TicketComments" asp-action="EditSub" asp-route-foo="@comment.Id" asp-route-id="@subcomment.Id">
+                                                        @Html.Hidden("TicketId", Model.Id)
+                                                        @Html.Hidden("AuthorId", UserManager.GetUserId(User))
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="form-group">
+                                                                    <input value="@subcomment.Content" name="subcommentContent" class="form-control tiny" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="mb-2 ml-auto">
+                                                                <button type="submit" class="btn btn-secondary btn-md mr-2">Save</button>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                             </div>
                             <hr />
@@ -459,7 +660,7 @@
                                         <img class="img-fluid d-md-flex mr-sm-4 rounded-circle" src="~Images/author10.jpg" alt="">
                                         <div class="media-body align-self-center position-relative">
                                             <div class="row">
-                                                <div class="col-12">
+                                                <div class="col-10" style="word-wrap: break-word; word-break:break-word">
                                                     @Html.Raw(subcomment.Content)
                                                 </div>
                                             </div>
@@ -475,18 +676,48 @@
         </div>
     </div>
 }
+<a data-toggle="modal" data-target="#errorModal" id="error-button"></a>
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="background-color:#1c2020">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Hmmmm...</h5>
+                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow: scroll;">
+                <div class="col" style="width:100%">
+                    <h1 class="text-center">@TempData["StopIt"]</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts{
-    <script src="~/js/select2.full.min.js"></script>
-    <script src="~/js/select2.script.js"></script>
-    @if ((!User.IsInRole("Demo User")) || (await _ticketsService.OwnsTicket(Model.Id)))
+
+    @if (TempData["StopIt"] != null)
     {
         <script>
-        $('#sweet').click(function() {
+            $('#error-button').click();
+        </script>
+
+    }
+    <script src="~/js/tinymce/plugins/charactercount/plugin.js"></script>
+    <script src="~/js/select2.full.min.js"></script>
+    <script src="~/js/select2.script.js"></script>
+    @foreach (var comment1 in Model.TicketComments)
+    {
+        @if ((!User.IsInRole("Demo User") && await _rolesService.CanInteractTicket(Model.Id)) || (await _ticketsService.OwnsComment(comment1.Id)))
+        {
+            <script>
+        $('#sweet-@comment1.Id').click(function() {
                         Swal.fire({
                             title: 'Are you sure?',
                 background: '#ffffed',
-                text: "You'll be deleting all data associated with this ticket.",
+                text: "You'll be deleting all data associated with this comment.",
                 icon: 'warning',
                 iconColor: 'red',
                 showCancelButton: true,
@@ -499,7 +730,7 @@
                             Swal.fire({
                                 title: 'Delete Confirmed',
                         background: '#ffffed',
-                        html: '<p>The ticket was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                        html: '<p>The comment was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete-@comment1.Id\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
                         icon: 'success',
                         iconColor: 'gold',
                         showConfirmButton: false,
@@ -509,16 +740,16 @@
                 });
 
             })
-        </script>
-    }
-    else
-    {
-        <script>
-        $('#sweet').click(function() {
+            </script>
+        }
+        else
+        {
+            <script>
+        $('#sweet-@comment1.Id').click(function() {
                         Swal.fire({
                             title: 'Are you sure?',
                 background: '#ffffed',
-                text: "You'll be deleting all data associated with this ticket.",
+                text: "You'll be deleting all data associated with this comment.",
                 icon: 'warning',
                 iconColor: 'red',
                 showCancelButton: true,
@@ -543,11 +774,154 @@
                 });
 
             })
+            </script>
+        }
+
+
+        @foreach (var subcomment1 in comment1.TicketSubComments)
+        {
+            @if ((!User.IsInRole("Demo User") && await _rolesService.CanInteractTicket(Model.Id)) || (await _ticketsService.OwnsSub(subcomment1.Id)))
+            {
+                <script>
+        $('#sweet-@subcomment1.Id').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this comment.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                        background: '#ffffed',
+                        html: '<p>The comment was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete-@subcomment1.Id\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                        icon: 'success',
+                        iconColor: 'gold',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+                </script>
+            }
+            else
+            {
+                <script>
+        $('#sweet-@comment1.Id').click(function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                background: '#ffffed',
+                text: "You'll be deleting all data associated with this comment.",
+                icon: 'warning',
+                iconColor: 'red',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#1c2020',
+                confirmButtonText: 'Yes, delete it!',
+                allowOutsideClick: false
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Delete Confirmed',
+                                text: 'Well not really since you are a demo user and a real user created this... but we can pretend it was!',
+                        background: '#ffffed',
+                        icon: 'success',
+                        iconColor: 'gold',
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#1c2020',
+                        allowOutsideClick: false
+                                })
+                }
+                });
+
+            })
+                </script>
+            }
+        }
+
+    }
+
+
+
+
+    @if ((!User.IsInRole("Demo User") && await _rolesService.CanInteractTicket(Model.Id)) || (await _ticketsService.OwnsTicket(Model.Id)))
+    {
+        <script>
+            $('#sweet').click(function () {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    background: '#ffffed',
+                    text: "You'll be deleting all data associated with this ticket.",
+                    icon: 'warning',
+                    iconColor: 'red',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#1c2020',
+                    confirmButtonText: 'Yes, delete it!',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Delete Confirmed',
+                            background: '#ffffed',
+                            html: '<p>The ticket was consumed in a swarm of angry bees.</p><a href="javascript: document.getElementById(\'delete\').submit()" type="submit" value="Delete" class="btn" style="background-color:#1c2020; color:white">OK</a>',
+                            icon: 'success',
+                            iconColor: 'gold',
+                            showConfirmButton: false,
+                            allowOutsideClick: false
+                        })
+                    }
+                });
+
+            })
+        </script>
+    }
+    else
+    {
+        <script>
+            $('#sweet').click(function () {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    background: '#ffffed',
+                    text: "You'll be deleting all data associated with this ticket.",
+                    icon: 'warning',
+                    iconColor: 'red',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#1c2020',
+                    confirmButtonText: 'Yes, delete it!',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Delete Confirmed',
+                            text: 'Well not really since you are a demo user and a real user created this... but we can pretend it was!',
+                            background: '#ffffed',
+                            icon: 'success',
+                            iconColor: 'gold',
+                            showConfirmButton: true,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#1c2020',
+                            allowOutsideClick: false
+                        })
+                    }
+                });
+
+            })
         </script>
     }
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
-
     <script>
+
         document.querySelectorAll('.button').forEach(button => {
 
             let duration = 3000,

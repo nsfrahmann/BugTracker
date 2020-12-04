@@ -70,6 +70,12 @@ namespace BugTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCom([Bind("TicketId,AuthorId")] TicketComment comment, string commentContent)
         {
+            if (commentContent.ToCharArray().Length > 3000)
+            {
+                TempData["StopIt"] = "Either you're publishing a novel or trying to break the application. Either way, we don't have time for that. Sorry...";
+                return RedirectToAction("Details", "Tickets", new { Id = comment.TicketId });
+            }
+
             if (ModelState.IsValid)
             {
                 var userId = _userManager.GetUserId(User);
@@ -98,7 +104,7 @@ namespace BugTracker.Controllers
             }
             ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", comment.TicketId);
-            return View(comment);
+            return RedirectToAction("Details", "Tickets", new { Id = comment.TicketId });
         }
 
         [Authorize]
@@ -106,6 +112,12 @@ namespace BugTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateSub([Bind("TicketId,AuthorId,Created")] TicketSubComment subComment, string subcommentContent, int foo)
         {
+            if (subcommentContent.ToCharArray().Length > 3000)
+            {
+                TempData["StopIt"] = "Either you're publishing a novel or trying to break the application. Either way, we don't have time for that. Sorry...";
+                return RedirectToAction("Details", "Tickets", new { Id = TempData["IdForSub"] });
+            }
+
             if (ModelState.IsValid)
             {
                 subComment.Content = subcommentContent;
@@ -122,31 +134,20 @@ namespace BugTracker.Controllers
             return View(subComment);
         }
 
-        // GET: Comments/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comment = await _context.TicketComments.FindAsync(id);
-            if (comment == null)
-            {
-                return NotFound();
-            }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", comment.TicketId);
-            return View(comment);
-        }
-
         // POST: Comments/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TicketId,AuthorId,Content,Created")] TicketComment comment)
+        public async Task<IActionResult> EditCom(int id, [Bind("Id,TicketId,AuthorId,Content,Created")] TicketComment comment, string commentContent)
         {
+            if (commentContent.ToCharArray().Length > 3000)
+            {
+                TempData["StopIt"] = "Either you're publishing a novel or trying to break the application. Either way, we don't have time for that. Sorry...";
+                return RedirectToAction("Details", "Tickets", new { Id = comment.TicketId });
+            }
+
             if (id != comment.Id)
             {
                 return NotFound();
@@ -156,6 +157,7 @@ namespace BugTracker.Controllers
             {
                 try
                 {
+                    comment.Content = commentContent;
                     comment.Updated = DateTime.Now;
                     _context.Update(comment);
                     await _context.SaveChangesAsync();
@@ -171,11 +173,56 @@ namespace BugTracker.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Tickets", new { Id = comment.TicketId });
             }
             ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", comment.TicketId);
-            return View(comment);
+            return RedirectToAction("Details", "Tickets", new { Id = comment.TicketId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditSub(int id, [Bind("Id,CommentId,TicketId,AuthorId,Content,Created")] TicketSubComment subComment, string subcommentContent, int foo)
+        {
+            if (subcommentContent.ToCharArray().Length > 3000)
+            {
+                TempData["StopIt"] = "Either you're publishing a novel or trying to break the application. Either way, we don't have time for that. Sorry...";
+                return RedirectToAction("Details", "Tickets", new { Id = TempData["IdForSub"] });
+            }
+
+            if (id != subComment.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    subComment.Id = id;
+                    subComment.Content = subcommentContent;
+                    subComment.TicketCommentId = foo;
+                    subComment.Updated = DateTime.Now;
+                    _context.Update(subComment);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!SubCommentExists(subComment.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                var ticketId = (await _context.TicketComments.FindAsync(foo)).TicketId;
+                return RedirectToAction("Details", "Tickets", new { Id = ticketId });
+            }
+            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", subComment.AuthorId);
+            ViewData["CommentId"] = new SelectList(_context.TicketComments, "Id", "Id", subComment.TicketCommentId);
+            return View(subComment);
         }
 
         // GET: Comments/Delete/5
@@ -199,19 +246,35 @@ namespace BugTracker.Controllers
         }
 
         // POST: Comments/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteCom")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteComConfirmed(int id)
         {
             var comment = await _context.TicketComments.FindAsync(id);
             _context.TicketComments.Remove(comment);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Tickets", new { Id = comment.TicketId });
+        }
+
+        [HttpPost, ActionName("DeleteSub")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSubConfirmed(int id, int foo)
+        {
+            var subComment = await _context.TicketSubComments.FindAsync(id);
+            _context.TicketSubComments.Remove(subComment);
+            await _context.SaveChangesAsync();
+            var ticketId = (await _context.TicketComments.FindAsync(foo)).TicketId;
+            return RedirectToAction("Details", "Tickets", new { Id = ticketId });
         }
 
         private bool CommentExists(int id)
         {
             return _context.TicketComments.Any(e => e.Id == id);
+        }
+
+        private bool SubCommentExists(int id)
+        {
+            return _context.TicketSubComments.Any(e => e.Id == id);
         }
     }
 }

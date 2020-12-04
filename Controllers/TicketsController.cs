@@ -228,6 +228,7 @@ namespace BugTracker.Controllers
                             .Include(t => t.TicketStatus)
                             .Include(t => t.TicketType)
                             .Include(t => t.TicketComments)
+                            .Include(t => t.Attachments)
                             .AsNoTracking().FirstOrDefaultAsync(t => t.Id == ticket.Id);
 
                         if (selectedUsers != null)
@@ -252,12 +253,14 @@ namespace BugTracker.Controllers
                         ticket.Updated = DateTime.Now;
                         _context.Update(ticket);
                         await _context.SaveChangesAsync();
+
                         Ticket newTicket = await _context.Tickets
                             .Include(t => t.DeveloperUser)
                             .Include(t => t.TicketPriority)
                             .Include(t => t.TicketStatus)
                             .Include(t => t.TicketType)
                             .Include(t => t.TicketComments)
+                            .Include(t => t.Attachments)
                             .AsNoTracking().FirstOrDefaultAsync(t => t.Id == ticket.Id);
                         await _historiesService.AddHistory(oldTicket, newTicket, userId);
                         await _context.SaveChangesAsync();

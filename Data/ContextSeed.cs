@@ -30,7 +30,7 @@ namespace BugTracker.Data
                 await roleManager.CreateAsync(new IdentityRole("Project Manager"));
                 await roleManager.CreateAsync(new IdentityRole("Developer"));
                 await roleManager.CreateAsync(new IdentityRole("Submitter"));
-                await roleManager.CreateAsync(new IdentityRole("New User"));
+                await roleManager.CreateAsync(new IdentityRole("Basic User"));
                 await roleManager.CreateAsync(new IdentityRole("Demo User"));
         }
 
@@ -147,8 +147,8 @@ namespace BugTracker.Data
             {
                 UserName = "DemoAdmin@mailinator.com",
                 Email = "DemoAdmin@mailinator.com",
-                FirstName = "Michael",
-                LastName = "Scott",
+                FirstName = "Holly",
+                LastName = "Flax",
                 EmailConfirmed = true
             };
             try
@@ -174,8 +174,8 @@ namespace BugTracker.Data
             {
                 UserName = "DemoPM@mailinator.com",
                 Email = "DemoPM@mailinator.com",
-                FirstName = "Dwight",
-                LastName = "Schrute",
+                FirstName = "Andy",
+                LastName = "Bernard",
                 EmailConfirmed = true
             };
             try
@@ -201,8 +201,8 @@ namespace BugTracker.Data
             {
                 UserName = "DemoDev@mailinator.com",
                 Email = "DemoDev@mailinator.com",
-                FirstName = "Jim",
-                LastName = "Halpert",
+                FirstName = "Stanley",
+                LastName = "Hudson",
                 EmailConfirmed = true
             };
             try
@@ -228,8 +228,8 @@ namespace BugTracker.Data
             {
                 UserName = "DemoSubmitter@mailinator.com",
                 Email = "DemoSubmitter@mailinator.com",
-                FirstName = "Pam",
-                LastName = "Beesly",
+                FirstName = "Kevin",
+                LastName = "Malone",
                 EmailConfirmed = true
             };
             try

@@ -45,7 +45,7 @@ namespace BugTracker.Controllers
             var projectUsers = new List<SelectListItem>();
             foreach (var user in (await _projectsService.UsersNotOnProject(id)))
             {
-                if (!await _userManager.IsInRoleAsync(user, "Demo"))
+                if (!await _userManager.IsInRoleAsync(user, "Demo User"))
                 {
                     projectUsers.Add(new SelectListItem() { Text = user.FullName, Value = user.Id });
                 }

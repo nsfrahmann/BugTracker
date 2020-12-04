@@ -13,7 +13,7 @@
     var userDev = await UserManager.IsInRoleAsync(user, "Developer");
     var userSub = await UserManager.IsInRoleAsync(user, "Submitter");
     var userDemo = await UserManager.IsInRoleAsync(user, "Demo User");
-    var userNew = await UserManager.IsInRoleAsync(user, "New User");
+    var userNew = await UserManager.IsInRoleAsync(user, "Basic User");
     var ticketCount = await _ticketsService.GetUserTicketCount(userId);
     var projectCount = await _projectsService.GetUserProjectCount(userId);
 }
@@ -23,6 +23,7 @@
         .my-font {
             font-size: 1rem
         }
+
         img.circle {
             -moz-border-radius: 150px/150px;
             -webkit-border-radius: 150px 150px;
@@ -57,6 +58,198 @@
                 <defs>
                 <clipPath id="cut-off-arrow">
                 <circle cx="306" cy="306" r="287" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -187,6 +380,198 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
 
 
@@ -251,7 +636,391 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <feBlend in="SourceGraphic" in2="goo" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -385,6 +1154,198 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                             </svg>
             </div>
         </div>
@@ -449,14 +1410,30 @@ else
     <div class="row">
         <div class="col-12 mt-3">
             <div class="position-relative">
-                <div class="background-image-maker py-5" style="position:relative"><img src="@_attachmentsService.DecodeAttachment(Model.BannerData, Model.BannerName)" style="position: absolute; height: 200px; width: 100%; object-fit: cover" /></div>
+                <div class="background-image-maker py-5" style="position:relative">
+                    @if (Model.BannerData != null)
+                    {
+                        <img src="@_attachmentsService.DecodeAttachment(Model.BannerData, Model.BannerName)" style="position: absolute; height: 200px; width: 100%; object-fit: cover" />
+                    }
+                    else
+                    {
+                        <img src="~/img/bee-banner.jpg" style="position: absolute; height: 200px; width: 100%; object-fit: cover" />
+                    }
+                </div>
                 <div class="holder-image">
                     <img src="" alt="" class="img-fluid d-none" />
                 </div>
                 <div class="position-relative px-3 py-5">
 
                     <div class="media d-md-flex d-block">
-                        <img src="@_attachmentsService.DecodeAttachment(Model.AvatarData, Model.AvatarName)" class="img-fluid circle" style="object-fit: cover; margin-top: -60px; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);" />
+                        @if (Model.AvatarData != null)
+                        {
+                            <img src="@_attachmentsService.DecodeAttachment(Model.AvatarData, Model.AvatarName)" class="img-fluid circle" style="object-fit: cover; margin-top: -60px; box-shadow: 0px 0px 7px 0px rgba(0,0,0,1);" />
+                        }
+                        else
+                        {
+                            <img src="~/img/beekeeper.jpg" class="img-fluid circle" style="box-shadow: 0px 0px 7px 0px rgba(0,0,0,1); margin-top: -60px" />
+                        }
                         <div class="media-body z-index-1">
                             <div class="pl-4">
                                 <div class="row">
@@ -501,7 +1478,7 @@ else
                                             }
                                             @if (userNew == true)
                                             {
-                                                <span class="text-uppercase text-white mb-0 my-font"><b>New User</b></span>
+                                                <span class="text-uppercase text-white mb-0 my-font"><b>Basic User</b></span>
                                             }
 
                                             <span class="ml-3 text-white my-font">Contact: <span class="text-lowercase">@Model.User.Email</span></span>
@@ -574,7 +1551,7 @@ else
             <div class="profile-menu mt-5 theme-background border col-12 z-index-1 p-2" style="background-color: #101414;">
                 <div class="d-sm-flex" style="position:relative">
                     <div class="align-self-center col-10">
-                        <div class="ml-1 mt-2"><h4 class="ml-3">Here's a little about @Model.User.FirstName</h4></div>
+                        <div class="ml-1 mt-2"><h4 class="ml-3" style="color:gold;">Here's a little about @Model.User.FirstName</h4></div>
                         <div class="ml-3 mt-3"><h5 class="ml-5" style="word-wrap: break-word">@Html.Raw(Model.Bio)</h5></div>
                     </div>
                     <div class="row" style="width: 100px; position:absolute ; top: 7%; left: 85%">
@@ -595,4 +1572,34 @@ else
             </div>
         </div>
     </div>
+}
+
+<a data-toggle="modal" data-target="#errorModal" id="error-button"></a>
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="background-color:#1c2020">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:gold">Hmmmm...</h5>
+                <button type="button" style="color:gold" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow: scroll;">
+                <div class="col" style="width:100%">
+                    <h1 class="text-center">@TempData["StopIt"]</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    @if (TempData["StopIt"] != null)
+    {
+        <script>
+            $('#error-button').click();
+        </script>
+
+    }
 }

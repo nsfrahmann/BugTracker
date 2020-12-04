@@ -113,6 +113,23 @@ namespace BugTracker.Services
             return await _context.Tickets.Where(t => t.ProjectId == projectId).CountAsync();
         }
 
+        public async Task<int> GetAttachmentCount(int ticketId)
+        {
+            return await _context.TicketAttachments.Where(a => a.TicketId == ticketId).CountAsync();
+        }
+
+        public async Task<int> GetCommentCount(int ticketId)
+        {
+            var comments = await _context.TicketComments.Where(c => c.TicketId == ticketId).ToListAsync();
+            var subcomments = new List<TicketSubComment>();
+            foreach (var comment in comments)
+            {
+                subcomments = await _context.TicketSubComments.Where(sc => sc.TicketCommentId == comment.Id).ToListAsync();
+            }
+            var total = comments.Count + subcomments.Count;
+            return total;
+        }
+
         public async Task<int> GetUserTicketCount(string userId)
         {
             return await _context.Tickets.Where(t => t.DeveloperUserId == userId).CountAsync();
@@ -216,6 +233,51 @@ namespace BugTracker.Services
 
             bool result = false;
             if (ticket != null)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        public async Task<bool> OwnsAttachment(int attachmentId)
+        {
+            var userLogged = _httpContext.HttpContext.User;
+            var userId = _userManager.GetUserId(userLogged);
+            var attachment = await _context.TicketAttachments.FirstOrDefaultAsync(a => a.Id == attachmentId && a.UserId == userId);
+
+            bool result = false;
+            if (attachment != null)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        public async Task<bool> OwnsComment(int commentId)
+        {
+            var userLogged = _httpContext.HttpContext.User;
+            var userId = _userManager.GetUserId(userLogged);
+            var comment = await _context.TicketComments.FirstOrDefaultAsync(c => c.Id == commentId && c.AuthorId == userId);
+
+            bool result = false;
+            if (comment != null)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        public async Task<bool> OwnsSub(int subCommentId)
+        {
+            var userLogged = _httpContext.HttpContext.User;
+            var userId = _userManager.GetUserId(userLogged);
+            var sub = await _context.TicketSubComments.FirstOrDefaultAsync(c => c.Id == subCommentId && c.AuthorId == userId);
+
+            bool result = false;
+            if (sub != null)
             {
                 result = true;
             }

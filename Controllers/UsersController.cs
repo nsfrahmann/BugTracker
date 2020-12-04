@@ -118,6 +118,14 @@ namespace BugTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProfileCreate([Bind("UserId,Created")] string userId, string bio, IFormFile Avatar, IFormFile BannerImage)
         {
+            if (bio.ToCharArray().Length > 3000)
+            {
+                TempData["StopIt"] = "You're either writing out your entire life story or trying to break the application. Either way please be more brief. Sorry...";
+                var userProfile = await _context.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
+                var myId = userProfile.UserId;
+                return RedirectToAction("Profile", "Users", new { Id = myId });
+            }
+
             if (ModelState.IsValid)
             {
                 userId = _userManager.GetUserId(User);
