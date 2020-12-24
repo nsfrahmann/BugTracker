@@ -13,11 +13,11 @@ namespace BugTracker.Models
     public class BTUser : IdentityUser
     {
         [Required]
-        [StringLength(50)]
+        [StringLength(20)]
         public string FirstName { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(20)]
         public string LastName { get; set; }
 
         [Display(Name = "FirstName")]

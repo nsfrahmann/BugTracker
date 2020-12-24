@@ -19,7 +19,7 @@ namespace BugTracker.Models
         
 
         [Required]
-        [StringLength(30)]
+        [StringLength(50)]
         [Display(Name = "Project Name")]
         public string Name { get; set; }
 

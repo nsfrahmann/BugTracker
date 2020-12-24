@@ -114,7 +114,7 @@ namespace BugTracker.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Summary,OwnerUser,OwnerUserId,ImagePath,ImageData,Created")] Project project, List<string> selectedUsers)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Summary,OwnerUser,OwnerUserId,Created")] Project project, List<string> selectedUsers)
         {
             if (id != project.Id)
             {
@@ -145,7 +145,44 @@ namespace BugTracker.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Projects", new { Id = project.Id } );
+            }
+            return View(project);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveUser(int id, [Bind("Id,Name,Summary,OwnerUser,OwnerUserId,ProjectUserIds,Created")] Project project, string userId)
+        {
+            if (id != project.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    project.Updated = DateTime.Now;
+                    var projectUser = await _context.ProjectUsers.FirstOrDefaultAsync(pu => pu.UserId == userId && pu.ProjectId == project.Id);
+                    _context.ProjectUsers.Remove(projectUser);
+                    project.ProjectUserIds.Remove(userId);
+                    _context.Update(project);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ProjectExists(project.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Details", "Projects", new { project.Id });
             }
             return View(project);
         }

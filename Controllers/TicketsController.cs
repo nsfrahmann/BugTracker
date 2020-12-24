@@ -289,6 +289,42 @@ namespace BugTracker.Controllers
             return RedirectToAction("Index", "Tickets");
         }
 
+        //[Authorize]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> RemoveUser(int id, [Bind("Id,Title,Description,OwnerUserId,DeveloperUserId,Created")] Ticket ticket, int foo)
+        //{
+        //    if (id != ticket.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            ticket.ProjectId = foo;
+        //            ticket.Updated = DateTime.Now;
+        //            ticket.DeveloperUser = null;
+        //            _context.Update(ticket);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!TicketExists(ticket.Id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction("Details", "Tickets", new { ticket.Id });
+        //    }
+        //    return View(ticket);
+        //}
+
 
         // POST: Tickets/Delete/5
         [Authorize]

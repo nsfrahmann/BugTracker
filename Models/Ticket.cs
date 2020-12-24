@@ -22,7 +22,7 @@ namespace BugTracker.Models
         }
         public int Id { get; set; }
         [Required]
-        [StringLength(30)]
+        [StringLength(50)]
         public string Title { get; set; }
         [Required]
         [StringLength(300)]

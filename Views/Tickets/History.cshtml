@@ -29,32 +29,32 @@
                                 <div class="row timeline position-relative">
                                     <div class="col-12 col-md-6 text-left text-lg-right">
                                         <div class="py-0 py-xl-2">
-                                            @if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) != !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            @if (history.OldDeveloperValue != history.NewDeveloperValue)
                                             {
                                                 <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
                                                 <p>
-                                                    <span class="font-weight-bold">@history.OldDeveloperValue was removed from this Ticket and has been replaced by @history.NewDeveloperValue</span>
+                                                    <span class="font-weight-bold">@history.OldDeveloperValue was removed from this ticket and has been replaced by @history.NewDeveloperValue</span>
                                                 </p>
                                             }
-                                            else if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) == !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            else if (history.OldDeveloperValue == history.NewDeveloperValue)
                                             {
                                                 <span class="text-uppercase text-primary d-block">Assigned Developer</span>
                                                 <p>
                                                     <span class="font-weight-bold text-muted">@history.DeveloperAssigned was left unchanged</span>
                                                 </p>
                                             }
-                                            else if (string.IsNullOrWhiteSpace(history.OldDeveloperValue) && !string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            else if (history.OldDeveloperValue == null && history.NewDeveloperValue != null)
                                             {
                                                 <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
                                                 <p>
-                                                    <span class="font-weight-bold">@history.NewDeveloperValue has been assigned to this Ticket</span>
+                                                    <span class="font-weight-bold">@history.NewDeveloperValue has been assigned to this ticket</span>
                                                 </p>
                                             }
-                                            else if (!string.IsNullOrWhiteSpace(history.OldDeveloperValue) && string.IsNullOrWhiteSpace(history.NewDeveloperValue))
+                                            else if (history.OldDeveloperValue != null && history.NewDeveloperValue == null)
                                             {
                                                 <span class="text-uppercase text-primary d-block">Assigned Developer Change</span>
                                                 <p>
-                                                    <span class="font-weight-bold">@history.OldDeveloperValue has been removed from this Ticket and a new Developer assignment is needed.</span>
+                                                    <span class="font-weight-bold">@history.OldDeveloperValue has been removed from this ticket and a new Developer assignment is needed.</span>
                                                 </p>
                                             }
                                             else

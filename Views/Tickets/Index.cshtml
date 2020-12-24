@@ -95,12 +95,12 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
+                        <a href='/Users/Profile/@item.OwnerUserId?click=true&userId=@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
                     </td>
                     @if (item.DeveloperUser != null)
                     {
                         <td>
-                            <a href='/Users/Profile/@item.DeveloperUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.DeveloperUser.Initials</span></div>@item.DeveloperUser.FullName</a>
+                            <a href='/Users/Profile/@item.DeveloperUserId?click=true&userId=@item.DeveloperUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.DeveloperUser.Initials</span></div>@item.DeveloperUser.FullName</a>
                         </td>
                     }
                     else
@@ -110,7 +110,7 @@
                         </td>
                     }
                     <td style="position:relative">
-                        @if (await _rolesService.CanInteractTicket(item.Id))
+                        @if (await _rolesService.CanInteractTicket(item.Id) || await _ticketsService.OwnsTicket(item.Id))
                         {
                             <a href="#" data-toggle="modal" data-target="#editModal-@item.Id" style="position:absolute; left:10px;"><i class="icon-pencil icons"></i></a>
                             <a href="#" id="sweet-@item.Id" style="position:absolute; left:30px"><i class="icon-trash icons"></i></a>

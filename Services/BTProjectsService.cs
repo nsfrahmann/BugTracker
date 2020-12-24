@@ -110,6 +110,17 @@ namespace BugTracker.Services
             return projectUsers;
         }
 
+        public async Task<int> UsersOnProjectCount(int projectId)
+        {
+            Project project = await _context.Projects
+                .Include(u => u.ProjectUsers)
+                .ThenInclude(u => u.User)
+                .FirstOrDefaultAsync(u => u.Id == projectId);
+
+            int userCount = project.ProjectUsers.Select(p => p.User).ToList().Count;
+            return userCount;
+        }
+
         public async Task<List<Project>> All()
         {
             var model = await _context.Projects

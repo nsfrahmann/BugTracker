@@ -131,7 +131,24 @@
                         <dd class="col-sm-12">
                             @foreach (var user in await _projectsService.UsersOnProject(Model.Id))
                             {
-                                <p>@user.FullName</p>
+                                <div class="row ml-1 mb-1">@user.FullName
+                            
+                                @if (User.IsInRole("Administrator") || (User.IsInRole("Project Manager") && await _rolesService.CanInteractProject(Model.Id)))
+                                {
+                                    <form style="width:30px;" method="post" asp-action="RemoveUser" asp-route-id="@Model.Id">
+                                        <input type="hidden" asp-for="@Model.Name" />
+                                        <input type="hidden" asp-for="@Model.Summary" />
+                                        <input type="hidden" asp-for="@Model.Id" />
+                                        <input type="hidden" asp-for="@Model.OwnerUserId" />
+                                        <input type="hidden" asp-for="@Model.ProjectUserIds" />
+                                        <input type="hidden" asp-for="@Model.Created" />
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button class="textButton text-white pt-1" type="submit"><i class="icon-close ml-3"></i></button>
+                                    </form>
+                                }
+
+                                </div>
+
                             }
                         </dd>
                     }
@@ -166,9 +183,9 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="@Model.Name" />
                             <input type="hidden" asp-for="@Model.Summary" />
-                            <input type="hidden" asp-for="Id" />
-                            <input type="hidden" asp-for="OwnerUserId" />
-                            <input type="hidden" asp-for="Created" />
+                            <input type="hidden" asp-for="@Model.Id" />
+                            <input type="hidden" asp-for="@Model.OwnerUserId" />
+                            <input type="hidden" asp-for="@Model.Created" />
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card-body form-group">
@@ -185,7 +202,10 @@
                                                     }
                                                     else { }
                                                 }
-                                                <option value="@userLogged.Id">@userLogged.FullName</option>
+                                                @if (await UserManager.IsInRoleAsync(userLogged, "Administrator"))
+                                                {
+                                                    <option value="@userLogged.Id">@userLogged.FullName</option>
+                                                }
                                             }
                                             <optgroup label="Project Managers">Project Managers</optgroup>
                                             @foreach (var person in selectUsers)
@@ -196,7 +216,11 @@
                                                 }
                                                 else { }
                                             }
-                                            <option value="@userLogged.Id">@userLogged.FullName</option>
+
+                                            @if (await UserManager.IsInRoleAsync(userLogged, "Project Manager"))
+                                            {
+                                                <option value="@userLogged.Id">@userLogged.FullName</option>
+                                            }
                                             <optgroup label="Developers">Developers</optgroup>
                                             @foreach (var person in selectUsers)
                                             {
@@ -206,7 +230,7 @@
                                                 }
                                                 else { }
                                             }
-                                            <optgroup label="Submitters">Submitters</optgroup>
+                                            @*<optgroup label="Submitters">Submitters</optgroup>
                                             @foreach (var person in selectUsers)
                                             {
                                                 if ((await UserManager.IsInRoleAsync(person, "Submitter") == true))
@@ -214,7 +238,7 @@
                                                     <option value="@person.Id">@person.FullName</option>
                                                 }
                                                 else { }
-                                            }
+                                            }*@
                                         </select>
                                     </div>
                                 </div>

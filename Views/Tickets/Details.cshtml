@@ -216,9 +216,20 @@
                     </dt>
                     @if (Model.DeveloperUser != null)
                     {
-                        <dd class="col-sm-12">
-                            @Model.DeveloperUser.FullName
-                        </dd>
+                    <dd class="col-sm-12">
+                        @Model.DeveloperUser.FullName
+
+                        @*<form style="width:30px;" method="post" asp-action="RemoveUser" asp-route-id="@Model.Id" asp-route-foo="@Model.ProjectId">
+                            <input type="hidden" asp-for="@Model.Title" />
+                            <input type="hidden" asp-for="@Model.Description" />
+                            <input type="hidden" asp-for="@Model.Id" />
+                            <input type="hidden" asp-for="@Model.OwnerUserId" />
+                            <input type="hidden" asp-for="@Model.DeveloperUserId" />
+                            <input type="hidden" asp-for="@Model.Created" />
+                            <button class="textButton text-white pt-1" type="submit"><i class="icon-close ml-3"></i></button>
+                        </form>*@
+
+                    </dd>
                     }
                     else
                     {
@@ -228,13 +239,11 @@
                     }
                 </dl>
 
-                @if ((await _projectsService.UsersOnProject(Model.ProjectId)) != null)
+                @if (await _rolesService.CanInteractTicket(Model.Id) && (User.IsInRole("Administrator") || User.IsInRole("Project Manager")))
                 {
-                    @if (await _rolesService.CanInteractTicket(Model.Id))
-                    {
-                        <button name="TicketAssign" value="TicketAssign" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary mb-2 ml-2">Assign to Ticket</button>
-                    }
+                    <button name="TicketAssign" value="TicketAssign" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary mb-2 ml-2">Assign to Ticket</button>
                 }
+
             </div>
         </div>
     </div>
@@ -250,7 +259,7 @@
                 </div>
                 <div class="modal-body" style="overflow: scroll;">
                     <div class="col select-target">
-                        @if (Model.Project.ProjectUserIds != null)
+                        @if (await _projectsService.UsersOnProjectCount(Model.ProjectId) > 0)
                         {
                             <form asp-action="Edit" asp-route-id="@Model.Id">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -267,49 +276,46 @@
                                         <div class="card-body form-group">
                                             <label class="text-white">Select or search for one user to assign this ticket</label>
                                             <select id="single-select" asp-for="@Model.DeveloperUserId" name="selectedUsers" class="col-12" data-allow-clear="1">
-                                                @if (!await UserManager.IsInRoleAsync(userLogged, "Project Manager"))
+                                                @if (!(await UserManager.IsInRoleAsync(userLogged, "Project Manager")))
                                                 {
                                                     <optgroup class="text-center" label="Administrators">Administrators</optgroup>
-                                                    @foreach (var userid in Model.Project.ProjectUserIds)
+                                                    @foreach (var projectuser in await _projectsService.UsersOnProject(Model.ProjectId))
                                                     {
-                                                        var thisUser = await _projectsService.GetProjectUser(userid);
-                                                        if ((await UserManager.IsInRoleAsync(thisUser, "Administrator") == true))
+
+                                                        if ((await UserManager.IsInRoleAsync(projectuser, "Administrator")))
                                                         {
-                                                            <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                            <option value="@projectuser.Id">@projectuser.FullName</option>
                                                         }
                                                         else { }
                                                     }
                                                 }
                                                 <optgroup label="Project Managers">Project Managers</optgroup>
-                                                @foreach (var userid in Model.Project.ProjectUserIds)
+                                                @foreach (var projectuser in await _projectsService.UsersOnProject(Model.ProjectId))
                                                 {
-                                                    var thisUser = await _projectsService.GetProjectUser(userid);
-                                                    if ((await UserManager.IsInRoleAsync(thisUser, "Project Manager") == true))
+                                                    if (await UserManager.IsInRoleAsync(projectuser, "Project Manager"))
                                                     {
-                                                        <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                        <option value="@projectuser.Id">@projectuser.FullName</option>
                                                     }
                                                     else { }
                                                 }
                                                 <optgroup label="Developers">Developers</optgroup>
-                                                @foreach (var userid in Model.Project.ProjectUserIds)
+                                                @foreach (var projectuser in await _projectsService.UsersOnProject(Model.ProjectId))
                                                 {
-                                                    var thisUser = await _projectsService.GetProjectUser(userid);
-                                                    if ((await UserManager.IsInRoleAsync(thisUser, "Developer") == true))
+                                                    if (await UserManager.IsInRoleAsync(projectuser, "Developer"))
                                                     {
-                                                        <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                        <option value="@projectuser.Id">@projectuser.FullName</option>
                                                     }
                                                     else { }
                                                 }
-                                                <optgroup label="Submitters">Submitters</optgroup>
-                                                @foreach (var userid in Model.Project.ProjectUserIds)
+                                                @*<optgroup label="Submitters">Submitters</optgroup>
+                                                @foreach (var projectuser in await _projectsService.UsersOnProject(Model.ProjectId))
                                                 {
-                                                    var thisUser = await _projectsService.GetProjectUser(userid);
-                                                    if ((await UserManager.IsInRoleAsync(thisUser, "Submitter") == true))
+                                                    if (await UserManager.IsInRoleAsync(projectuser, "Submitter"))
                                                     {
-                                                        <option value="@thisUser.Id">@thisUser.FullName</option>
+                                                        <option value="@projectuser.Id">@projectuser.FullName</option>
                                                     }
                                                     else { }
-                                                }
+                                                }*@
                                             </select>
                                         </div>
                                     </div>

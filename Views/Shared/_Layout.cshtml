@@ -217,6 +217,14 @@
             background-color: #000 !important;
         }
 
+        button.textButton:hover, button.textButton:focus {
+            color: gold !important;
+        }
+
+        .btn:active {
+            transform: scale(.94)
+        }
+
         a.my-reply {
             color: #007bff !important;
         }
@@ -316,6 +324,7 @@
         .mce-path {
             display: none !important;
         }
+
     </style>
 
 </head>
@@ -647,8 +656,11 @@
                         <ul>
                             <li><a asp-controller="Projects" asp-action="Index"><i class="icon-docs"></i> All</a></li>
                             @*<li><a href="index-account.html"><i class="icon-layers"></i> Project Assignments</a></li>
-                                <li><a href="index-analytic.html"><i class="icon-grid"></i> My Creates</a></li>*@
-                            <li><a asp-controller="Projects" asp-action="Create" data-toggle="modal" data-target="#createProjectModal"><i class="icon-note"></i> Create New</a></li>
+        <li><a href="index-analytic.html"><i class="icon-grid"></i> My Creates</a></li>*@
+                            @if (User.IsInRole("Administrator") || User.IsInRole("Project Manager"))
+                            {
+                                <li><a asp-controller="Projects" asp-action="Create" data-toggle="modal" data-target="#createProjectModal"><i class="icon-note"></i> Create New</a></li>
+                            }
                         </ul>
                     </li>
                     <li class="dropdown">
@@ -656,23 +668,29 @@
                         <ul>
                             <li><a asp-controller="Tickets" asp-action="Index"><i class="icon-docs"></i> All</a></li>
                             @*<li><a href="app-filemanager.html"><i class="icon-folder"></i> Ticket Assignments</a></li>
-                                <li><a href="app-mail.html"><i class="icon-envelope"></i> My Submits</a></li>*@
-                            <li><a asp-controller="Tickets" asp-action="Analytics"><i class="icon-pie-chart"></i> Analytics</a></li>
-                            <li><a asp-controller="Tickets" asp-action="Create" data-toggle="modal" data-target="#createTicketModal"><i class="icon-note"></i> Create New</a></li>
+        <li><a href="app-mail.html"><i class="icon-envelope"></i> My Submits</a></li>*@
+                            @if ((!User.IsInRole("Basic User")) && (!User.IsInRole("Submitter")))
+                            {
+                                <li><a asp-controller="Tickets" asp-action="Analytics"><i class="icon-pie-chart"></i> Analytics</a></li>
+                            }
+                            @if (!User.IsInRole("Basic User"))
+                            {
+                                <li><a asp-controller="Tickets" asp-action="Create" data-toggle="modal" data-target="#createTicketModal"><i class="icon-note"></i> Create New</a></li>
+                            }
                         </ul>
 
                     </li>
-                    <li class="dropdown">
-                        <a href="#" style="background-color: #232b2b"><i class="icon-graduation mr-1"></i> Assignment</a>
-                        <ul>
-                            @*<li><a><i class="icon-support"></i> Assign To Project</a></li>
-        <li><a><i class="icon-people"></i> Assign To Ticket</a></li>*@
-                            @if (User.IsInRole("Administrator") || User.IsInRole("Project Manager"))
-                            {
-                                <li><a asp-controller="UserRoles" asp-action="Assign" data-toggle="modal" data-target="#assignRolesModal"><i class="icon-shuffle"></i> Role Manager</a></li>
-                            }
-                        </ul>
-                    </li>
+                    @if (User.IsInRole("Administrator") || User.IsInRole("Project Manager"))
+                    {
+                        <li class="dropdown">
+                            <a href="#" style="background-color: #232b2b"><i class="icon-graduation mr-1"></i> Assignment</a>
+                            <ul>
+                                @*<li><a><i class="icon-support"></i> Assign To Project</a></li>
+            <li><a><i class="icon-people"></i> Assign To Ticket</a></li>*@
+                                    <li><a asp-controller="UserRoles" asp-action="Assign" data-toggle="modal" data-target="#assignRolesModal"><i class="icon-shuffle"></i> Role Manager</a></li>
+                            </ul>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
@@ -709,7 +727,6 @@
     <script src="~/js/datatable.script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="~/js/toastr.min.js"></script>
-    <script src="~/js/toastr.script.js"></script>
     <script src="https://cdn.tiny.cloud/1/ll8zhakbba1xr0km3e379sdk1lgtrjbl3cltdf4o4gen6z6n/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="~/js/select2.full.min.js"></script>
     <script src="~/js/select2.script.js"></script>

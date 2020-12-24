@@ -13,6 +13,7 @@ namespace BugTracker.Services
         public Task AddUserToProject(string userId, int projectId);
         public Task RemoveUserFromProject(string userId, int projectId);
         public Task<ICollection<BTUser>> UsersOnProject(int projectId);
+        public Task<int> UsersOnProjectCount(int projectId);
         public Task<ICollection<BTUser>> UsersNotOnProject(int projectId);
         public Task<List<Project>> All();
         public Project Project();

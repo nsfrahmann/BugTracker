@@ -1482,7 +1482,11 @@ else
                                             }
 
                                             <span class="ml-3 text-white my-font">Contact: <span class="text-lowercase">@Model.User.Email</span></span>
-                                            <a href="#" data-toggle="modal" data-target="#editProfileModal" style="font-size: 1.2rem"><i class="pl-1 icon-pencil icons"></i></a>
+                                            @if (Model.UserId == user.Id)
+                                            {
+                                                <a href="#" data-toggle="modal" data-target="#editProfileModal" style="font-size: 1.2rem"><i class="pl-1 icon-pencil icons"></i></a>
+                                            }
+
                                         </div>
                                     </h1>
                                     <div class="col"></div>

@@ -63,11 +63,11 @@
                     <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
-                    <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer;">
+                    <td onclick="location.href='/Projects/Details/@item.Id';" style="cursor: pointer; max-width: 500px;">
                         @Html.DisplayFor(modelItem => item.Summary)
                     </td>
                     <td>
-                        <a href='/Users/Profile/@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
+                        <a href='/Users/Profile/@item.OwnerUserId?click=true&userId=@item.OwnerUserId' class="row p-0 mb-1 ml-2" style="width:100%"><div class="rounded-circle bg-primary text-white mr-2" style="width: 25px; height:25px; position:relative"><span style="position:absolute;margin-left:2px; margin-top:1px">@item.OwnerUser.Initials</span></div>@item.OwnerUser.FullName</a>
                     </td>
                     @if (item.ProjectUsers.Count() > 0)
                     {
